@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ODTÜmus Prime #25601 | Özel Scouting & Takım Araştırma Portalı</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --primary-text: #0f172a;
+    --heading-blue: #0369a1;
+    --th-bg: #f0f9ff;
+    --th-text: #0c4a6e;
+    --sec-bg: #e0f2fe;
+    --sec-border: #0284c7;
+    --accent: #d97706;
+    --border: #cbd5e1;
+    --bg-light: #f8fafc;
+    --edit-hover: #fef9c3;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #e2e8f0;
+    color: var(--primary-text);
+    font-size: 11px;
+    line-height: 1.42;
+  }
+
+  /* ================= ŞİFRE GİRİŞ EKRANI (LOGIN GATE) ================= */
+  #loginOverlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .login-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 14px;
+    padding: 32px 28px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    border-top: 6px solid var(--sec-border);
+  }
+  .login-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .login-card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+  .login-card p {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+  .login-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+    outline: none;
+    transition: 0.2s;
+  }
+  .login-input:focus {
+    border-color: var(--sec-border);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  }
+  .login-btn {
+    width: 100%;
+    background: var(--sec-border);
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .login-btn:hover {
+    background: #0369a1;
+  }
+  .login-error {
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* Uygulama Ana Kapsayıcısı (Şifre girilene kadar gizli) */
+  #appContent {
+    display: none;
+  }
+
+  /* ================= ÜST KONTROL BARI ================= */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: #ffffff;
+    color: #0f172a;
+    padding: 10px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 3px solid var(--sec-border);
+  }
+  .toolbar-left, .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .toolbar h1 {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--heading-blue);
+  }
+  .toolbar select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #94a3b8;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn {
+    border: none;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11.5px;
+    cursor: pointer;
+    transition: 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn-import { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+  .btn-import:hover { background: #bae6fd; }
+  .btn-save { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+  .btn-save:hover { background: #bbf7d0; }
+  .btn-print { background: #0284c7; color: #ffffff; }
+  .btn-print:hover { background: #0369a1; }
+  .btn-lock { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .btn-lock:hover { background: #fecaca; }
+
+  .save-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #166534;
+    background: #f0fdf4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #bbf7d0;
+  }
+
+  /* Tekil Takım Hızlı Turnuva Seçici */
+  .quick-event-editor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    font-size: 11px;
+  }
+  .quick-event-editor label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .modal-card {
+    background: #fff;
+    width: 100%;
+    max-width: 820px;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-card h3 { font-size: 15px; color: var(--heading-blue); margin-bottom: 6px; }
+  .modal-card p { font-size: 11.5px; color: #475569; margin-bottom: 12px; }
+  .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+  .import-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; background: #f8fafc; }
+  .import-box label { font-weight: 700; font-size: 11.5px; display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .import-box label a { color: #0284c7; text-decoration: none; }
+  .import-box textarea { width: 100%; height: 85px; border: 1px solid #94a3b8; border-radius: 4px; padding: 6px; font-size: 10.5px; font-family: monospace; }
+
+  /* ================= A4 SAYFA DÜZENİ ================= */
+  .page {
+    width: 210mm;
+    height: 296mm;
+    background: #ffffff;
+    margin: 15px auto;
+    padding: 10mm 13mm;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+    break-after: page;
+    position: relative;
+  }
+
+  .header-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1.5px solid #cbd5e1;
+    border-left: 6px solid var(--sec-border);
+    margin-bottom: 6px;
+  }
+  .header-title h2 { font-size: 14.5px; font-weight: 800; color: #0c4a6e; }
+  .header-title p { font-size: 9.5px; color: #475569; margin-top: 2px; font-weight: 500; }
+  .team-badge { text-align: right; }
+  .team-badge .num { font-size: 19px; font-weight: 800; color: var(--accent); }
+  .team-badge .page-ind { font-size: 8.5px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+
+  .section-title {
+    background: var(--sec-bg);
+    color: #0c4a6e;
+    font-weight: 800;
+    font-size: 10.5px;
+    padding: 4px 10px;
+    border-left: 4px solid var(--sec-border);
+    border-radius: 3px;
+    margin: 6px 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  table.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 5px;
+  }
+  table.info-table th, table.info-table td {
+    border: 1px solid var(--border);
+    padding: 4.5px 8px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  table.info-table th {
+    background: var(--th-bg);
+    color: var(--th-text);
+    font-weight: 700;
+    width: 25%;
+    font-size: 10.2px;
+  }
+  table.info-table td {
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 500;
+  }
+
+  /* DÜZENLENEBİLİR (EDITABLE) ALAN STİLLERİ */
+  [contenteditable="true"] {
+    outline: none;
+    border-radius: 3px;
+    transition: background 0.15s, box-shadow 0.15s;
+    min-height: 16px;
+    cursor: text;
+  }
+  [contenteditable="true"]:hover {
+    background: #fefce8 !important;
+    box-shadow: inset 0 0 0 1px #fde047;
+  }
+  [contenteditable="true"]:focus {
+    background: #fef9c3 !important;
+    box-shadow: inset 0 0 0 1.5px #eab308;
+  }
+  [contenteditable="true"]:empty:before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+    font-style: italic;
+  }
+
+  .event-pill {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 10px;
+    margin-right: 5px;
+    margin-bottom: 2px;
+  }
+  .event-pill.hisar {
+    background: #e0e7ff;
+    color: #1e40af;
+    border-color: #a5b4fc;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  .box {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    background: #ffffff;
+  }
+  .box-fill { background: var(--bg-light); }
+  .box h4 {
+    font-size: 10px;
+    font-weight: 800;
+    color: #0c4a6e;
+    background: #f0f9ff;
+    border-bottom: 1px solid var(--border);
+    margin: -6px -8px 5px -8px;
+    padding: 4px 8px;
+    border-radius: 3px 3px 0 0;
+  }
+
+  /* Tıklanabilir Checkbox & Derecelendirme Kutuları */
+  .chk-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 3px 0;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .square {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    background: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    color: #fff;
+    transition: 0.1s;
+  }
+  .square.checked {
+    background: #0284c7;
+    border-color: #0284c7;
+  }
+  .square.checked::after {
+    content: "✓";
+  }
+
+  /* 1-5 Puan Seçici */
+  .rate-group {
+    display: inline-flex;
+    gap: 5px;
+  }
+  .rate-btn {
+    padding: 2px 6px;
+    border: 1px solid #94a3b8;
+    border-radius: 4px;
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 9.5px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .rate-btn.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0369a1;
+  }
+
+  .notes-lines {
+    height: 70px;
+    background: repeating-linear-gradient(
+      #fff,
+      #fff 18px,
+      #e2e8f0 19px
+    );
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10.5px;
+    line-height: 19px;
+    overflow-y: auto;
+  }
+
+  .footer-bar {
+    border-top: 1.5px solid #94a3b8;
+    padding-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #475569;
+    font-weight: 600;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+  }
+  .tag-vet { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+  .tag-rookie { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+  .official-link {
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 9.5px;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar, .modal-overlay, #loginOverlay { display: none !important; }
+    /* Şifre girilmediyse yazdırmayı da engelle */
+    body:not(.authenticated) #appContent { display: none !important; }
+    .page {
+      margin: 0;
+      box-shadow: none;
+      width: 210mm;
+      height: 296mm;
+    }
+    [contenteditable="true"]:hover, [contenteditable="true"]:focus {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 1. ŞİFRE KORUMA EKRANI (LOGIN GATE) ================= -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-badge">🔒 YETKİLİ TAKIM GİRİŞİ</div>
+    <h2>ODTÜmus Prime #25601</h2>
+    <p>Scouting & Takım Araştırma Portalı'na erişmek için lütfen takım erişim şifresini giriniz.</p>
+    <form onsubmit="checkAccess(event)">
+      <input type="password" id="pinInput" class="login-input" placeholder="•••••" autocomplete="off" autofocus>
+      <button type="submit" class="login-btn">Portala Giriş Yap</button>
+      <div id="loginError" class="login-error">⚠️ Hatalı şifre! Lütfen tekrar deneyin.</div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= 2. ANA UYGULAMA İÇERİĞİ ================= -->
+<div id="appContent">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <h1>🤖 #25601 Scouting Portalı</h1>
+      <select id="teamFilter" onchange="onTeamSelect()">
+        <option value="all">Tüm Takımları Göster (35 Takım - 70 Sayfa)</option>
+      </select>
+
+      <button class="btn btn-import" onclick="openImportModal()" title="Resmi turnuva listelerini yapıştırarak eşitle">📥 4 Turnuva Eşitle</button>
+
+      <!-- Seçili Takımın 2026 Turnuvalarını Hızlı Güncelleme Kutusu -->
+      <div class="quick-event-editor" id="eventEditorBox" style="display:none;">
+        <span style="color:#0369a1; font-weight:700;">Bu Yıl:</span>
+        <label><input type="checkbox" value="1. Hisar Turnuvası (5 Aralık 2026)" onchange="updateTeamEvents()"> 1. Hisar</label>
+        <label><input type="checkbox" value="2. Hisar Turnuvası (6 Aralık 2026)" onchange="updateTeamEvents()"> 2. Hisar</label>
+        <label><input type="checkbox" value="1. Piri Reis Turnuvası (19 Aralık 2026)" onchange="updateTeamEvents()"> 1. Piri Reis</label>
+        <label><input type="checkbox" value="2. Piri Reis Turnuvası (20 Aralık 2026)" onchange="updateTeamEvents()"> 2. Piri Reis</label>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <span class="save-badge" id="saveStatus">✓ Otomatik Kayıt Aktif</span>
+      <button class="btn btn-save" onclick="exportJSON()" title="Doldurulan tüm bilgileri bilgisayara yedekle">💾 Verileri İndir (.json)</button>
+      <button class="btn btn-import" onclick="document.getElementById('fileInput').click()" title="Daha önce indirilen .json yedeğini yükle">📂 Yedek Yükle</button>
+      <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importJSON(event)">
+      <button class="btn btn-print" onclick="window.print()">🖨️ PDF / Yazdır</button>
+      <button class="btn btn-lock" onclick="lockPortal()" title="Portalı Kilitle">🔒 Çıkış</button>
+    </div>
+  </div>
+
+  <!-- 4 Turnuva Linkinden Toplu Veri Aktarma Modalı -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal-card">
+      <h3>📥 Resmi FIRST Turnuva Sayfalarından (TREYQ1, TREYQ2, TRTUQ1, TRTUQ2) Otomatik Eşitleme</h3>
+      <p>Aşağıdaki 4 resmi bağlantıya tıklayıp açılan sayfadaki tabloyu (<strong>Ctrl+A</strong> ve <strong>Ctrl+C</strong> ile) kopyalayıp ilgili kutuya yapıştırın. Sistem 5 haneli takım numaralarını otomatik okuyup 35 takımın tamamının 2026 turnuvalarını güncelleyecektir.</p>
+      
+      <div class="import-grid">
+        <div class="import-box">
+          <label><span>1. Hisar Turnuvası (TREYQ1)</span><a href="https://ftc-events.firstinspires.org/2026/TREYQ1" target="_blank">Sayfayı Aç ↗</a></label>
+          <textarea id="txt_TREYQ1" placeholder="TREYQ1 sayfasındaki metni buraya yapıştırın..."></textarea>
+        </div>
+        <div class="import-box">
+          <label><span>2. Hisar Turnuvası (TREYQ2)</span><a href="https://ftc-events.firstinspires.org/2026/TREYQ2" target="_blank">Sayfayı Aç ↗</a></label>
+          <textarea id="txt_TREYQ2" placeholder="TREYQ2 sayfasındaki metni buraya yapıştırın..."></textarea>
+        </div>
+        <div class="import-box">
+          <label><span>1. Piri Reis Turnuvası (TRTUQ1)</span><a href="https://ftc-events.firstinspires.org/2026/TRTUQ1" target="_blank">Sayfayı Aç ↗</a></label>
+          <textarea id="txt_TRTUQ1" placeholder="TRTUQ1 sayfasındaki metni buraya yapıştırın..."></textarea>
+        </div>
+        <div class="import-box">
+          <label><span>2. Piri Reis Turnuvası (TRTUQ2)</span><a href="https://ftc-events.firstinspires.org/2026/TRTUQ2" target="_blank">Sayfayı Aç ↗</a></label>
+          <textarea id="txt_TRTUQ2" placeholder="TRTUQ2 sayfasındaki metni buraya yapıştırın..."></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span id="importStatus" style="font-weight:700; color:#166534; font-size:12px;"></span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn" style="background:#e2e8f0; color:#0f172a;" onclick="closeImportModal()">Kapat</button>
+          <button class="btn btn-print" onclick="processBulkImport()">✅ Eşitle ve Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pagesContainer"></div>
+</div>
+
+<script>
+// ============================================================================
+// 🔐 GİRİŞ ŞİFRESİ AYARI (İstediğiniz şifreyi buraya yazabilirsiniz)
+// ============================================================================
+const ACCESS_PIN = "25601"; 
+
+function checkAccess(e) {
+  e.preventDefault();
+  const val = document.getElementById("pinInput").value.trim();
+  if (val === ACCESS_PIN) {
+    sessionStorage.setItem("odtumus_scouting_auth", "true");
+    unlockPortal();
+  } else {
+    const err = document.getElementById("loginError");
+    err.style.display = "block";
+    document.getElementById("pinInput").value = "";
+  }
+}
+
+function unlockPortal() {
+  document.getElementById("loginOverlay").style.display = "none";
+  document.getElementById("appContent").style.display = "block";
+  document.body.classList.add("authenticated");
+}
+
+function lockPortal() {
+  sessionStorage.removeItem("odtumus_scouting_auth");
+  document.body.classList.remove("authenticated");
+  document.getElementById("appContent").style.display = "none";
+  document.getElementById("loginOverlay").style.display = "flex";
+  document.getElementById("pinInput").value = "";
+}
+
+if (sessionStorage.getItem("odtumus_scouting_auth") === "true") {
+  unlockPortal();
+}
+
+// ============================================================================
+// 📋 35 TAKIMIN VARSAYILAN VERİ SETİ
+// ============================================================================
+const defaultTeams = [
+  {
+    num: "23911", name: "Aydos", city: "Pendik, İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Pendik Merkezli Okul / Topluluk Takımı",
+    web: "-", ig: "@aydosrobotics", email: "Turnuva Pit İletişimi",
+    sponsors: "Pendik Yerel Eğitim ve Teknoloji Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 DECODE Sezonu İstanbul Elemeleri, 2023-2024 CENTERSTAGE Sezonu",
+    awards: "🏆 2023-2026: Türkiye'nin en düşük takım numaralı aktif 2023 girişli FTC takımlarından biri olarak düzenli turnuva katılımı.",
+    stats: "Tuzla Piri Reis Üniversitesi kampüsüne en yakın lokasyondaki (Pendik) deneyimli takımlardan biridir.",
+    chassis: "Standart Kit / Mecanum Şasi (REV / goBILDA ekosistemi)",
+    software: "Java / Blocks, Temel Otonom Park ve Obje Bırakma",
+    outreach: "Pendik bölgesindeki ortaokul ve lise öğrencilerine yönelik okul içi robotik tanıtım stantları açmakta, yeni başlayan öğrencilere temel mekanik montaj ve algoritma eğitimi vermektedir.",
+    collab: "Piri Reis Turnuvası (Tuzla) öncesinde Pendik-Tuzla hattında lojistik ve pit alanı yardımlaşması yapılabilir.",
+    priority: "Orta - Turnuva İçi Pit Ziyareti",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "24140", name: "Lavender Robotics", city: "Salihli, Manisa (45)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Bağımsız Aile / Topluluk Takımı (Community Team)",
+    web: "-", ig: "@lavenderrobotics24140", email: "lavenderrobotics24140@gmail.com",
+    sponsors: "Salihli Yerel Sanayi ve Eğitim Sponsorları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2026 İstanbul Premier Event (Rumeli Div.), 2025 Türkiye Şampiyonası, 1., 2., 3. ve 4. Piri Reis Turnuvaları, 2025 Salihli FTC Scrimmage, İtalya Şampiyonası, 1. ve 2. Üsküdar Turnuvaları",
+    awards: "🏆 2026 İstanbul Premier Event (Rumeli Div.): Finalist Alliance - 2nd Team Selected<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Think Award Winner (1.lik)<br>🏆 2025-2026 1. Piri Reis: Think Award | 2. Piri Reis: Reach Award | 3. Piri Reis: Sustain Award | 4. Piri Reis: Reach Award<br>🏆 2024-2025 Italy Championship: Compass Award Winner & Connect Award 3rd Place<br>🏆 2024-2025 1. Üsküdar: Think Award 2nd Place | 2023-2024 Greece National: Design & Promote Award Winner",
+    stats: "12+ Resmi Turnuva deneyimi. Mühendislik Portfolyosu (Think Award) ve Sürdürülebilirlikte Türkiye'nin en çok ödül alan takımlarından biri.",
+    chassis: "Özel Tasarım Destekli Mecanum Şasi, CAD Odaklı Modüler Mekanizmalar",
+    software: "Gelişmiş Java Otonom, Sensör Füzyonu ve Kararlı TeleOp Kontrolleri",
+    outreach: "Manisa Salihli'de resmi 'Salihli FTC Scrimmage' organizasyonunu düzenleyerek Ege bölgesindeki takımlara ev sahipliği yapmıştır. Kırsal bölgelerdeki okullarda STEM atölyeleri yürütmekte, İtalya ve Yunanistan şampiyonalarında Türkiye'yi temsil ederek uluslararası takım ağı kurmaktadır.",
+    collab: "1. ve 2. Piri Reis Turnuvalarında birlikte yarışacağız! İzmir-Salihli yakınlığı sebebiyle turnuva öncesi yüz yüze Scrimmage ve Mühendislik Portfolyosu (Think Award) inceleme toplantısı yapılabilir.",
+    priority: "Çok Yüksek - 1. & 2. Piri Reis Ortağı ve Ege Scrimmage",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "24230", name: "AG Robotik", city: "Büyükçekmece, İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "ALKEV Özel Ortaokulu (FRC #6459 AG Robotik Kardeş Takımı)",
+    web: "https://www.alkev.k12.tr", ig: "@agrobotik / @jr.agrobotik", email: "info@alkev.k12.tr",
+    sponsors: "Motorobit.com, RoboPiece, SELUZ, Ufuk Kontrol Araçları, Eczacıbaşı Bilişim, TEMKO, GLOCAL",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2026 İstanbul Premier Event (Rumeli Div.), 2025 Türkiye Şampiyonası (Playoff), 1. ve 4. Piri Reis Turnuvaları, 2025 FIRST World Championship (Houston)",
+    awards: "🏆 2025-2026 4. Piri Reis Turnuvası: Inspire Award Winner (1.lik) & Winning Alliance 1st Pick (Şampiyon)<br>🏆 2025-2026 1. Piri Reis Turnuvası: Inspire Award 2nd Place & Winning Alliance 1st Pick (Şampiyon)<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Eleme 12.si (76.45 npOPR) & Playoff İttifakı (Q-26'da #25601 ile ittifak: 132-118 Galibiyet)<br>🏆 2024-2025 FTC Türkiye Şampiyonası: Inspire Award 2nd Place (Houston Dünya Şampiyonası Yükselişi)",
+    stats: "Best OPR: 81.58 (Auto: 25.33, Teleop: 61.71) - Dünya Yüzdelik Dilimi: %87.5.",
+    chassis: "Yüksek Hızlı Mecanum Şasi, RoboPiece & Motorobit destekli özel aktarma organları",
+    software: "Yüksek doğruluklu Otonom (25.33 Auto OPR), Odometry ve Görüntü İşleme",
+    outreach: "Okul bünyesinde #28743 Jr. AG Robotik kardeş takımını kurarak alt sınıflara akran mentörlüğü yapmaktadır. FRC #6459 takımıyla birlikte Büyükçekmece bölgesindeki devlet okullarına robotik atölye ziyaretleri düzenlemekte ve parça tedarikçileriyle (RoboPiece/Motorobit) yerli FTC ekosistemini desteklemektedir.",
+    collab: "Her iki takımın da özel ortaokul takımı olması ve geçen sezon Türkiye Şampiyonası Q-26 maçında birlikte kazanmış olmaları sebebiyle harika bir kardeş okul/akran mentörlüğü ortağıdır.",
+    priority: "Çok Yüksek - Ortaokul Kardeş Takım & Teknik Alışveriş",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "24501", name: "ERROR", city: "Merkez, Diyarbakır (21)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Diyarbakır Merkezli Okul / Topluluk Takımı",
+    web: "-", ig: "@ftc24501", email: "Sosyal Medya / Pit İletişimi",
+    sponsors: "Diyarbakır Yerel Kurum ve Eğitim Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 3. Piri Reis Turnuvası (Playoff Yarı Finalisti)",
+    awards: "🏆 2025-2026 3. Piri Reis Turnuvası: Playoff İttifakı (#24140 Lavender Robotics ile birlikte mücadele etti)<br>🏆 Not: 3. Piri Reis Q-13 maçında #25601 ODTÜmus Prime ile ittifak kurarak 50-35 galip gelmiştir.",
+    stats: "Güneydoğu Anadolu Bölgesi'nin en kıdemli (2023 kuruluşlu) ve aktif FTC takımıdır.",
+    chassis: "Dayanıklı Mecanum / Kit Şasi",
+    software: "Java Tabanlı TeleOp ve Otonom Görev Kodu",
+    outreach: "Diyarbakır'da dezavantajlı bölgelerdeki öğrencileri robotik ve kodlama ile tanıştırmakta, Güneydoğu Anadolu'da yeni kurulan FTC takımlarına (#34744 Byte Jr vb.) yerel rehberlik ve atölye desteği sağlamaktadır.",
+    collab: "Geçen sezon 3. Piri Reis'te birlikte maç kazandığımız dost takım. 'İzmir - Diyarbakır Bilim Köprüsü' adı altında ortak online STEM atölyesi düzenlemek jüri portfolyosu için çok değerlidir.",
+    priority: "Yüksek - Bölgeler Arası Outreach Projesi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25039", name: "Golden Horn Jr", city: "İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "İstanbul Merkezli Okul / Kulüp Takımı",
+    web: "-", ig: "@goldenhornjr", email: "Sosyal Medya DM",
+    sponsors: "İstanbul Teknoloji ve Eğitim Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "1. Piri Reis Turnuvası (19 Aralık 2026)"],
+    events2025: "2025-2026 FTC Türkiye Şampiyonası, 1., 3. ve 4. Piri Reis Turnuvaları, 2024-2025 Üsküdar & Türkiye Şampiyonası",
+    awards: "🏆 2025-2026 4. Piri Reis Turnuvası: Winning Alliance Captain (Şampiyon İttifak Kaptanı - #24230 ile)<br>🏆 2025-2026 1. Piri Reis Turnuvası: Winning Alliance Captain (Şampiyon İttifak Kaptanı - #24230 ile)<br>🏆 2025-2026 3. Piri Reis Turnuvası: Playoff Yarı Finalisti (#25602 DaçkaBots ile)<br>🏆 2024-2025 Sezonu: 94.9 OPR ortalaması ile Türkiye'nin en yüksek saha istatistiğine sahip takımlarından biri.",
+    stats: "Katıldığı 2 farklı Piri Reis turnuvasında da İttifak Kaptanı olarak şampiyonluk kupasını kaldırmış saha lideridir.",
+    chassis: "Yüksek Hızlı Rekabetçi Mecanum Şasi, Hızlı Cycle (Toplama-Atma) Mekanizması",
+    software: "Gelişmiş Otonom Rotalama, Sürücü Yardımcı Otomasyonları",
+    outreach: "İstanbul'daki yeni FTC takımlarına yönelik saha kurulumu, sürücü antrenmanı (Driver Practice) ve mekanik dayanıklılık üzerine açık atölye buluşmaları düzenlemektedir.",
+    collab: "Turnuva esnasında İttifak Seçimleri (Alliance Selection) için birincil stratejik ortaklardan biridir; maç öncesi scouting verileri mutlaka paylaşılmalıdır.",
+    priority: "Çok Yüksek - Saha İttifakı (Alliance Selection) Hedefi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25137", name: "Kuanta Robotics", city: "Pendik, İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Pendik Merkezli Lise / Ortaokul Robotik Takımı",
+    web: "-", ig: "@kuantarobotics", email: "Sosyal Medya DM",
+    sponsors: "Pendik Bölgesi Kurumsal Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 3. Piri Reis Turnuvası (Tuzla)",
+    awards: "🏆 2025-2026 3. Piri Reis Turnuvası Katılımcısı (Q-24 maçında #25601 ODTÜmus Prime ile mavi ittifakta birlikte mücadele ederek 79-65 galip gelmiştir).",
+    stats: "3. Piri Reis Q-24 maçında takımımız #25601 ile omuz omuza maç kazanmış uyumlu bir partnerdir.",
+    chassis: "Mecanum Yürüyen Aksam, REV Kontrol Sistemi",
+    software: "Java TeleOp ve Temel Otonom",
+    outreach: "Pendik ilçesindeki okullarda bilim şenlikleri düzenleyerek ilkokul ve ortaokul öğrencilerine temel robotik ve kuantum/bilim farkındalığı kazandırmaktadır.",
+    collab: "Geçen sezon birlikte kazanılan maçın fotoğraf/videosu üzerinden iletişime geçilerek Piri Reis Turnuvası öncesi online hazırlık sohbeti yapılabilir.",
+    priority: "Orta - Dostane İletişim & Saha Partnerliği",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25153", name: "Cartesian Robotics", city: "Çankaya, Ankara (06)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Öğrenci Liderlikli Bağımsız / Okul Takımı (25+ Öğrenci)",
+    web: "https://team25153.com/", ig: "@cartesianrobotics", email: "team25153.com iletişim formu",
+    sponsors: "Ankara Teknoloji, Savunma ve Mühendislik Sponsorları",
+    events2026: ["2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2026 FIRST World Championship (Houston), 2025 Türkiye Şampiyonası, 1. ve 2. Piri Reis, 2025 FIRST World Championship, 2024 Türkiye Şampiyonası, 1. ve 2. Üsküdar, 2023 Yunanistan Şampiyonası",
+    awards: "🏆 2025-2026 FIRST World Championship (Houston - Franklin Div.): Sustain Award Winner (Dünya Şampiyonası Ödülü!)<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Inspire Award Winner (Türkiye 1.si) & Finalist Alliance Captain<br>🏆 2025-2026 1. Piri Reis: Inspire Award Winner (1.lik) | 2. Piri Reis: Inspire Award 2nd Place (2.lik)<br>🏆 2024-2025 FTC Türkiye Şampiyonası: Winning Alliance Captain (Türkiye Şampiyonu) & Think Award Winner<br>🏆 2024-2025 2. Üsküdar: Inspire Award 2nd Place & Finalist Alliance | 1. Üsküdar: Control Award Winner",
+    stats: "Üst üste 2 kez Dünya Şampiyonası'na (Houston) yükselen ve Houston'da Sustain Ödülü kazanan Türkiye'nin en kariyerli FTC takımlarından biridir.",
+    chassis: "Özel Tasarım CNC/3D Üretim Şasi (Robotlar: Cerberon, HILDA, X), Yüksek Mühendislik Kalitesi",
+    software: "Gelişmiş Odometry, PID, Görüntü İşleme ve Tam Otonom Senaryolar (Control Award Sahibi)",
+    outreach: "Öğrenci liderlikli sürdürülebilir takım yönetim modeli (Houston Sustain Award sahibi) geliştirmiştir. Web siteleri üzerinden açık kaynak mühendislik dökümanları yayınlamakta, Ankara'da STEM zirveleri ve çaylak FTC takımlarına yönelik kapsamlı mentörlük programları yürütmektedir.",
+    collab: "20 Aralık 2026'daki 2. Piri Reis Turnuvası'nda kesin olarak aynı sahadayız! Turnuva öncesi mutlaka online tanışma ve Sustain/Inspire deneyim paylaşımı toplantısı yapılmalıdır.",
+    priority: "Çok Yüksek - 2. Piri Reis Turnuvası Stratejik & Akademik Ortağı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25155", name: "MechaWolves", city: "İzmir (35)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Özel İZFEN Koleji Ortaokulu",
+    web: "-", ig: "@ftcmechawolves", email: "Instagram DM / İZFEN Koleji",
+    sponsors: "Photon Lazer, SolidWorks, İZFEN Eğitim Kurumları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "Şubat 2026 Kadıköy Scrimmage, 2025 Türkiye Şampiyonası, 3. ve 4. Piri Reis Turnuvaları, 2025 Salihli Scrimmage, 2024 1. ve 2. Üsküdar Turnuvaları",
+    awards: "🏆 Şubat 2026 Kadıköy Scrimmage: Winning Alliance 1st Pick (Şampiyon İttifak) & Think Award Winner<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Reach Award Winner & Playoff Yarı Finalisti (#25171 RoboTakev ile)<br>🏆 2025-2026 4. Piri Reis Turnuvası: Inspire Award 2nd Place (2.lik) & Finalist Alliance Captain<br>🏆 2025-2026 3. Piri Reis Turnuvası: Control Award Winner (1.lik)",
+    stats: "İzmir'in ortaokul kademesindeki en güçlü ve bol ödüllü takımlarından biridir.",
+    chassis: "SolidWorks ile tasarlanmış ve Photon Lazer ile kesilmiş özel metal/akrilik modüler Mecanum şasi",
+    software: "Control Award ödüllü sensör ve otonom yazılım mimarisi (Java)",
+    outreach: "Türkiye Şampiyonası 'Reach Award' sahibi olarak dijital medya üzerinden binlerce öğrenciye FIRST içerikleri ulaştırmış, İzmir'deki okullarda robotik tanıtım seminerleri düzenlemiş ve yerel sanayi firmalarıyla (Photon Lazer) üretim iş birlikleri kurmuştur.",
+    collab: "İzmir'de aynı kademede (Özel Ortaokul) yer aldığımız komşu takımımızdır. Okullar arası karşılıklı atölye ziyareti ve İzmir içi ortak Scrimmage maçı yapmak için en uygun partnerdir.",
+    priority: "Çok Yüksek - İzmir İçi Yüz Yüze Atölye & Dostluk Maçı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25163", name: "NoktaParantez", city: "İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "İstanbul Merkezli Okul / Topluluk Takımı",
+    web: "-", ig: "@noktaparantezftc", email: "Sosyal Medya DM",
+    sponsors: "Yazılım ve Eğitim Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "Şubat 2026 Kadıköy Scrimmage, 2025-2026 1. Piri Reis ve 3. Piri Reis Turnuvaları",
+    awards: "🏆 2025-2026 3. Piri Reis Turnuvası: Playoff İttifakı (#25577 ZAĞANOS ile birlikte çeyrek/yarı final mücadelesi)<br>🏆 Not: 3. Piri Reis Q-18 maçında #25601 ODTÜmus Prime ile mavi ittifakta birlikte yarışarak 58-19 galip gelmiştir.",
+    stats: "Hem resmi turnuvalara hem de sezon dışı Scrimmage'lara düzenli katılan aktif bir İstanbul takımıdır.",
+    chassis: "Mecanum Şasi, Modüler Toplama Sistemi",
+    software: "Java Tabanlı Otonom ve Sürücü Kontrolleri",
+    outreach: "Akranlarına yönelik algoritma, Java programlama ve açık kaynak yazılım eğitimleri düzenlemekte; Kadıköy Scrimmage gibi sezon dışı hazırlık turnuvalarında aktif görev alarak topluluk içi etkileşimi artırmaktadır.",
+    collab: "3. Piri Reis Q-18 maçında takımımızla birlikte 58-19 kazandıkları maç üzerinden iletişime geçilerek yeni sezon yazılım/mekanik sohbeti gerçekleştirilebilir.",
+    priority: "Orta - Turnuva Öncesi Online Buluşma",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25168", name: "Şişli BİLSEM Robotics", city: "Şişli, İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Şişli Bilim ve Sanat Merkezi (MEB BİLSEM)",
+    web: "https://sislibilsemrobotics.com/", ig: "@sislibilsemrobotics", email: "sislibilsemrobotics.com iletişim",
+    sponsors: "Şişli BİLSEM, Kamu ve Teknoloji Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "Temmuz 2026 Lisbon Scrimmage (Portekiz), Şubat 2026 Kadıköy Scrimmage, 2025 Türkiye Şampiyonası, 3. ve 4. Piri Reis Turnuvaları",
+    awards: "🏆 Şubat 2026 Kadıköy Scrimmage: Inspire Award Winner (1.lik)<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Connect Award Winner (Türkiye 1.si)<br>🏆 2025-2026 4. Piri Reis Turnuvası: Think Award 2nd Place (2.lik) & Playoff İttifakı<br>🏆 2025-2026 3. Piri Reis Turnuvası: Think Award Winner (1.lik)",
+    stats: "Best OPR: 33.56 (TR Şampiyonası). Jüri ödüllerinde (Inspire, Connect, Think) son derece istikrarlı bir grafiğe sahiptir.",
+    chassis: "BİLSEM atölyesinde geliştirilen 3D baskı ve kit entegreli Mecanum şasi",
+    software: "Java Otonom ve Görüntü İşleme, Detaylı Mühendislik Dokümantasyonu (Think Award)",
+    outreach: "Türkiye Şampiyonası 'Connect Award' 1.si olarak üniversiteler, mühendisler ve BİLSEM ağı ile güçlü köprüler kurmuştur. Portekiz'deki Lisbon Scrimmage'a katılarak uluslararası etkileşim sağlamış ve BİLSEM öğrencilerine yönelik robotik atölyeleri düzenlemiştir.",
+    collab: "Geçen sezon 4. Piri Reis Q-13'te birlikte 140-60 kazandığımız Şişli BİLSEM ile ortak 'Bilim ve Mühendislik Semineri' düzenlemek her iki takımın Connect portfolyosunu güçlendirir.",
+    priority: "Yüksek - Ortak Online STEM Semineri & Portfolyo Etkileşimi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25171", name: "RoboTakev", city: "İzmir (35)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "Özel TAKEV Okulları (FRC #8056 Laissez Faire Mentörlüğünde)",
+    web: "https://lf8056.com.tr", ig: "@robotakev", email: "Sosyal Medya DM / TAKEV Okulları",
+    sponsors: "TAKEV Eğitim Kurumları, İzmir Sanayi Destekçileri",
+    events2026: ["2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2026 FIRST World Championship (Houston), 2025 Türkiye Şampiyonası, 1. ve 2. Piri Reis, 2025 Salihli Scrimmage, 2025 FIRST World Championship, 2024 Türkiye Şampiyonası, 1. ve 2. Üsküdar",
+    awards: "🏆 2025-2026 FIRST World Championship (Houston): Compass Award Winner & Connect Award 2nd Place (Franklin Div.)<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Inspire Award 2nd Place (Türkiye 2.si) & Playoff Yarı Finalisti<br>🏆 2025-2026 2. Piri Reis Turnuvası: Inspire Award Winner (1.lik) & Finalist Alliance 1st Pick<br>🏆 2025-2026 1. Piri Reis Turnuvası: Control Award Winner (1.lik)<br>🏆 2024-2025 FTC Türkiye Şampiyonası: Inspire Award Winner (Türkiye 1.si) & Winning Alliance 1st Pick (Şampiyon)",
+    stats: "İki kez Houston Dünya Şampiyonası'na katılan, Türkiye Şampiyonası Inspire 1.liği/2.liği ve Houston'dan 2 ödülü bulunan İzmir'in en kıdemli takımı.",
+    chassis: "Özel CNC ve 3D Baskı Entegreli Profesyonel Mecanum Şasi",
+    software: "Control Award ödüllü ileri seviye Java yazılımı, Odometry ve Kamera entegrasyonu",
+    outreach: "Houston Dünya Şampiyonası 'Compass Award' ve 'Connect Award 2nd Place' sahibidir. FRC #8056 Laissez Faire ile entegre akran mentörlüğü yürütmekte, İzmir'deki sanayi kuruluşları ve üniversitelerle STEM projeleri geliştirmekte ve yeni FTC takımlarına rehberlik yapmaktadır.",
+    collab: "Hem İzmir'de yer almaları hem de 20 Aralık 2026'daki 2. Piri Reis Turnuvası'na resmi kayıtlı olmaları nedeniyle İzmir'de yüz yüze hazırlık buluşması mutlaka organize edilmelidir.",
+    priority: "Çok Yüksek - İzmir İçi Yüz Yüze Buluşma & 2. Piri Reis Ortağı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25572", name: "THEMİST", city: "İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "İstanbul Merkezli Okul / Kulüp Takımı",
+    web: "-", ig: "@themistftc", email: "Sosyal Medya DM",
+    sponsors: "Okul ve Yerel Sponsorlar",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 3. Piri Reis ve 4. Piri Reis Turnuvaları",
+    awards: "🏆 2025-2026 4. Piri Reis Turnuvası: Q-1 maçında #24230 ile 154-79 galibiyet; Q-28 maçında #25601 ODTÜmus Prime ile mavi ittifak ortağı olarak mücadele etmiştir.",
+    stats: "2023'ten bu yana İstanbul turnuvalarında düzenli yer alan deneyimli takım.",
+    chassis: "Mecanum Şasi, REV Ekosistemi",
+    software: "Java TeleOp ve Otonom",
+    outreach: "Okul içinde düzenledikleri teknoloji günleri ve atölyelerle alt sınıflardaki öğrencilere robotik sevgisi aşılamakta, kadınların mühendislikteki yeri (STEM'de Kızlar) üzerine farkındalık çalışmaları yürütmektedir.",
+    collab: "4. Piri Reis Q-28 maçındaki ortaklığımız üzerinden iletişime geçilerek yeni sezon robot hedefleri üzerine online görüşme yapılabilir.",
+    priority: "Orta - Turnuva Öncesi Online İletişim",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25578", name: "Maker Bee", city: "İstanbul (34)", rookie: "2023", status: "Veteran (4. Sezon)",
+    org: "İstanbul Merkezli Maker / Okul Takımı",
+    web: "-", ig: "@makerbeeftc", email: "Sosyal Medya DM",
+    sponsors: "Eğitim ve Maker Atölyesi Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "2025-2026 4. Piri Reis Turnuvası (Tuzla)",
+    awards: "🏆 2025-2026 4. Piri Reis Turnuvası Katılımcısı (Eleme maçlarında aktif mücadele).",
+    stats: "Maker kültürü, 3D tasarım ve prototipleme odaklı 4. sezon takımı.",
+    chassis: "3D Baskı Parça Destekli Kit Şasi",
+    software: "Java / Blocks Kontrol Sistemi",
+    outreach: "3D yazıcı kullanımı, açık kaynak tasarım ve 'Kendin Yap (Maker)' kültürünü yaymak üzere öğrencilere yönelik uygulamalı 3D modelleme ve prototipleme atölyeleri düzenlemektedir.",
+    collab: "BIOBUZZ sezonunun 'Arı (Bee)' teması ile takım adlarının (Maker Bee) ve bizim önceki sezon robotlarımızın (Bumblebee / Apis-1) uyumu üzerinden ortak bir sosyal medya/CAD etkileşimi yapılabilir!",
+    priority: "Orta - BIOBUZZ Temalı Sosyal Medya & CAD Etkileşimi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "25601", name: "ODTÜmus Prime", city: "Güzelbahçe, İzmir (35)", rookie: "2023", status: "Veteran (Ev Sahibi Takımımız)",
+    org: "ODTÜ Geliştirme Vakfı Özel İzmir Ortaokulu (Lead Mentör: Sercan EFE, Mentör: Mesut AKTÜRK)",
+    web: "https://odtumusprime.com", ig: "@odtumusprime25601", email: "odtumusprime.com",
+    sponsors: "ODTÜ Geliştirme Vakfı Okulları ve Kurumsal Destekçiler",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 FTC Türkiye Şampiyonası (Ataşehir), 3. Piri Reis Turnuvası (Playoff), 4. Piri Reis Turnuvası",
+    awards: "🏆 2025-2026 3. Piri Reis Turnuvası: Inspire Award 3rd Place (3.lük) & Eleme Sıralaması 5.si (W-L: 4-1-0) & Playoff Yarı Finalisti<br>🏆 2025-2026 4. Piri Reis Turnuvası: Eleme Sıralaması 10.su (38.26 npOPR, Q-22'de 270 puanlık ittifak galibiyeti)<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Eleme Sıralaması 11.si (W-L: 3-2-0, 47.93 npOPR, 100.40 npAVG)",
+    stats: "Best OPR: 47.93 (TeleOp: 38.75, Auto: 9.18). Türkiye Şampiyonası'nda 24 takım arasında 11. sırayı almıştır.",
+    chassis: "goBILDA Strafer Mecanum Şasi, Onshape / SolidWorks / OpenSCAD ile tasarlanmış özel mekanizmalar",
+    software: "Android Studio & Java, Limelight Akıllı Kamera ile Görüntü İşleme, REV Control/Expansion Hub",
+    outreach: "'We Build, We Learn, We Inspire.' mottosuyla 26 ortaokul öğrencisi ve 10 lise genç mentörün 6 alt takımda (Mekanik, Yazılım, Outreach, PR, Portfolyo, Sponsorluk) çalıştığı akran mentörlüğü modeli yürütmekte; odtumusprime.com web portalı üzerinden açık kaynak modüller sunmakta ve #36427 ile #37620 kardeş takımlarını kurarak ekosistemi büyütmektedir.",
+    collab: "Kendi ana takımımızdır. Bu kart, jüri sunumlarında ve diğer takımlara gönderilecek tanıtım dosyalarında doğrudan kullanılabilir.",
+    priority: "Ana Takımımız - Referans Tanıtım Kartı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "26363", name: "Florya Bisons", city: "Bakırköy, İstanbul (34)", rookie: "2024", status: "Veteran (3. Sezon)",
+    org: "Florya / Bakırköy Merkezli Okul Takımı",
+    web: "-", ig: "@floryabisons", email: "Sosyal Medya DM",
+    sponsors: "Bakırköy / Florya Eğitim Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "2025-2026 FTC Türkiye Şampiyonası (Playoff), 4. Piri Reis Turnuvası",
+    awards: "🏆 2025-2026 FTC Türkiye Şampiyonası: Playoff İttifak Kaptanı / Ortağı (#24230 AG Robotik ile M-1 ve M-6 Playoff maçlarında yarıştı)<br>🏆 Not: Türkiye Şampiyonası Q-21 maçında #25601 ODTÜmus Prime ile mavi ittifakta yer alarak 108-101 galip gelmiştir.",
+    stats: "Türkiye Şampiyonası'nda Playoff oynama başarısı göstermiş yüksek performanslı saha takımı.",
+    chassis: "Rekabetçi Mecanum Şasi, Hızlı Skorlama Mekanizması",
+    software: "Kararlı Java Otonom ve TeleOp Sürücü Kontrolleri",
+    outreach: "Bakırköy ve Florya bölgesindeki okullarda robotik kulübü tanıtımları yapmakta, turnuva öncesi diğer İstanbul takımlarıyla ortak antrenman ve strateji paylaşımları gerçekleştirmektedir.",
+    collab: "Türkiye Şampiyonası Q-21 maçında takımımızla birlikte 108-101 kazandığımız maç referans alınarak turnuva öncesi strateji ve hazırlık toplantısı yapılabilir.",
+    priority: "Yüksek - Saha İttifakı & Strateji Ortağı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "28743", name: "Jr. AG Robotik", city: "Büyükçekmece, İstanbul (34)", rookie: "2024", status: "Veteran (3. Sezon)",
+    org: "ALKEV Özel Ortaokulu (#24230 AG Robotik Kardeş Takımı)",
+    web: "https://www.alkev.k12.tr", ig: "@jr.agrobotik", email: "info@alkev.k12.tr",
+    sponsors: "ALKEV, Motorobit.com, RoboPiece",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2026 İstanbul Premier Event (Rumeli Div.), 2025 Türkiye Şampiyonası, 1. ve 4. Piri Reis Turnuvaları",
+    awards: "🏆 2026 İstanbul Premier Event (Rumeli Division): Uluslararası Premier Turnuva Katılımcısı<br>🏆 2025-2026 FTC Türkiye Şampiyonası: Ulusal Şampiyona Katılımcısı<br>🏆 2025-2026 1. ve 4. Piri Reis Turnuvaları: Başarılı Eleme Performansı",
+    stats: "ALKEV Özel Ortaokulu'nun ikinci FTC takımı olarak hem Türkiye Şampiyonası hem de İstanbul Premier Event'te boy göstermiştir.",
+    chassis: "goBILDA / REV Mecanum Şasi, Ortaokul Öğrencileri Tarafından Geliştirilen Modüler Tasarım",
+    software: "Java Otonom ve TeleOp",
+    outreach: "Ortaokulun küçük yaş gruplarını (5. ve 6. sınıflar) FTC'ye hazırlayan basamak takımı olarak çalışmakta, okul içi STEM şenliklerinde ilkokul öğrencilerine robotik gösterileri sunmaktadır.",
+    collab: "Bizim de bu sezon #25601, #36427 ve #37620 olarak çoklu takım yapısına geçmemiz sebebiyle ALKEV'in (#24230 & #28743) çoklu takım yönetim deneyimini konuşmak için harika bir eşleşmedir.",
+    priority: "Yüksek - Çoklu Ortaokul Takımı Deneyim Paylaşımı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "29304", name: "Sultangazi Bilim ve İnovasyon Merkezi", city: "Sultangazi, İstanbul (34)", rookie: "2024", status: "Veteran (3. Sezon)",
+    org: "Sultangazi Belediyesi Bilim ve İnovasyon Merkezi",
+    web: "-", ig: "@sultangazibim", email: "Sultangazi Belediyesi Bilim Merkezi",
+    sponsors: "Sultangazi Belediyesi",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "2024-2025 INTO THE DEEP Sezonu Turnuvaları",
+    awards: "🏆 Kamu / Belediye destekli bilim merkezi takımı olarak dezavantajlı öğrencilere ücretsiz robotik eğitimi sunmaktadır.",
+    stats: "Bilim merkezi altyapısıyla geniş öğrenci kitlesine hitap eden kamu takımı.",
+    chassis: "Kit Tabanlı Mecanum Şasi, 3D Baskı Bileşenler",
+    software: "Java / Blocks Programlama",
+    outreach: "Sultangazi Belediyesi Bilim Merkezi bünyesinde ilçedeki devlet okulu öğrencilerine ücretsiz robotik, elektronik ve kodlama eğitimleri vermekte; dar gelirli bölgelerdeki çocukların uluslararası yarışmalara katılımını sağlamaktadır.",
+    collab: "Bilim merkezi öğrencileriyle bizim öğrencilerimiz arasında online 'Web Geliştirme / 3D CAD' atölyesi düzenlemek sosyal sorumluluk açısından çok değerlidir.",
+    priority: "Yüksek - Kamu/Bilim Merkezi Outreach İş Birliği",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "29613", name: "Joyful Robotics", city: "İstanbul (34)", rookie: "2024", status: "Veteran (3. Sezon)",
+    org: "İstanbul Merkezli Okul / Kulüp Takımı",
+    web: "-", ig: "@joyfulrobotics", email: "Sosyal Medya DM",
+    sponsors: "Eğitim ve Teknoloji Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "Şubat 2026 Kadıköy Scrimmage, 2025 Türkiye Şampiyonası, 1., 3. ve 4. Piri Reis Turnuvaları",
+    awards: "🏆 2025-2026 4. Piri Reis Turnuvası: Finalist Alliance (Finalist İttifak - #25155 MechaWolves ile birlikte final oynadı)<br>🏆 2025-2026 1. Piri Reis Turnuvası: Finalist Alliance (Finalist İttifak - #25185 PARS BASAKSEHIR ile birlikte final oynadı)<br>🏆 2025-2026 3. Piri Reis Turnuvası: Q-9 maçında 214 puanlık rekor ittifak skoruna imza attı.",
+    stats: "Katıldığı 1. ve 4. Piri Reis turnuvalarının her ikisinde de Büyük Final oynama başarısı göstermiş çok güçlü bir saha takımıdır.",
+    chassis: "Yüksek Hızlı Mecanum Şasi, Seri Obje Toplama ve Skorlama Sistemi",
+    software: "Yüksek Puanlı Otonom ve Hızlı TeleOp Kontrolleri",
+    outreach: "Eğlenceli bilim (Joyful STEM) yaklaşımıyla küçük yaş gruplarına yönelik oyunlaştırılmış robotik etkinlikleri düzenlemekte ve Kadıköy Scrimmage gibi yerel hazırlık turnuvalarında diğer takımlara mentorluk desteği vermektedir.",
+    collab: "Saha performansı çok yüksek olduğu için Piri Reis Turnuvası öncesinde teknik scouting ve maç stratejisi görüşmesi yapılması önerilir.",
+    priority: "Yüksek - Saha Performansı & İttifak Adayı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "30749", name: "Siyabot Robotics", city: "Merkez, Şırnak (73)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "Şırnak Merkezli Okul / Gençlik Merkezi Takımı",
+    web: "-", ig: "@siyabotrobotics", email: "Sosyal Medya DM",
+    sponsors: "Şırnak Yerel Kurumları ve Fikret Yüksel Vakfı Destekleri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "Şubat 2026 Kadıköy Scrimmage (Saint-Joseph Lisesi, İstanbul), 2025-2026 Sezonu Elemeleri",
+    awards: "🏆 Şırnak'ta kurulan 3 FTC takımından (#30749, #30751, #30754) 2026-2027 sezonunda da kaydını yenileyerek yola devam eden tek Şırnak temsilcisidir.<br>🏆 Şubat 2026'da Şırnak'tan İstanbul'a gelerek Kadıköy Scrimmage'da 6 maçta mücadele etmiştir.",
+    stats: "Coğrafi uzaklığa rağmen İstanbul'daki hazırlık turnuvalarına katılacak kadar azimli bir Doğu/Güneydoğu takımıdır.",
+    chassis: "Kit Tabanlı Şasi, Geliştirilebilir Mekanik Sistemler",
+    software: "Java / Blocks Temel Otonom ve Sürücü Kodu",
+    outreach: "Şırnak merkez ve köy okullarındaki öğrencilere ilk kez yarışma robotlarını tanıtarak bölgede STEM farkındalığı yaratmakta, kısıtlı imkanlara rağmen kız ve erkek öğrencilerin mühendislik projelerine katılımını teşvik etmektedir.",
+    collab: "Şırnak'taki bu azimli takımla kardeş takım olup 3D baskı yedek parça, Limelight/Java eğitim dökümanı veya online mentörlük paylaşmak Motivate ve Connect ödülleri için benzersiz bir projedir.",
+    priority: "Çok Yüksek - Kardeş Takım & Teknik Destek (Outreach)",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "30766", name: "RISING STAR", city: "İnegöl, Bursa (16)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "İnegöl Merkezli Okul Takımı (Eski Adı: ORHANIYE R SPORTS Jr)",
+    web: "-", ig: "@risingstarftc", email: "Sosyal Medya DM",
+    sponsors: "İnegöl Eğitim ve Sanayi Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 1. Piri Reis Turnuvası (ORHANIYE R SPORTS Jr adıyla katıldı)",
+    awards: "🏆 2025-2026 1. Piri Reis Turnuvası Katılımcısı (Bursa İnegöl'ün tek aktif FTC temsilcisidir).",
+    stats: "Bu sezon takım adını 'ORHANIYE R SPORTS Jr' yerine 'RISING STAR' olarak yenileyerek ikinci sezonuna girmiştir.",
+    chassis: "Mecanum / Kit Şasi",
+    software: "Java / Blocks",
+    outreach: "Bursa İnegöl ilçesinde tek aktif FTC takımı olarak yerel okullarda robotik turnuvalarını tanıtmakta ve İnegöl sanayisindeki yerel üreticilerle öğrencileri bir araya getirmektedir.",
+    collab: "Bursa'daki tek aktif FTC takımı olmaları sebebiyle bölgesel tanışma toplantısı ve online teknik paylaşım yapılabilir.",
+    priority: "Orta - Online Tanışma & Deneyim Paylaşımı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "30771", name: "Roborabat", city: "Dörtyol, Hatay (31)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "Dörtyol / Hatay Merkezli Okul veya Atölye Takımı",
+    web: "-", ig: "@roborabat30771", email: "Sosyal Medya DM",
+    sponsors: "Hatay Yerel Destekçileri ve Eğitim Vakıfları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 3. Piri Reis Turnuvası (Tuzla, İstanbul)",
+    awards: "🏆 2025-2026 3. Piri Reis Turnuvası Katılımcısı (Q-3 maçında #25601 ODTÜmus Prime ile aynı maçta sahaya çıkmıştır).",
+    stats: "Deprem bölgesi Hatay'ı (Dörtyol) FTC Türkiye sahalarında başarıyla ve kararlılıkla temsil eden 2. sezon takımıdır.",
+    chassis: "REV / goBILDA Kit Tabanlı Şasi",
+    software: "Java / Blocks Otonom ve TeleOp",
+    outreach: "6 Şubat depremlerinden etkilenen Hatay Dörtyol'da öğrencilerin bilim, teknoloji ve takım çalışması yoluyla rehabilitasyonuna ve akademik gelişimine katkı sağlamakta; bölgedeki gençlere umut ve mühendislik vizyonu aşılamaktadır.",
+    collab: "Geçen sezon 3. Piri Reis Q-3 maçında karşılıklı oynadığımız Hatay temsilcisi ile dayanışma ve teknik destek toplantısı yapmak çok anlamlı bir Outreach adımıdır.",
+    priority: "Çok Yüksek - Hatay Dayanışma & Teknik Mentörlük",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "32334", name: "Asteria", city: "Ankara (06)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "Ankara Merkezli Okul / Topluluk Takımı",
+    web: "-", ig: "@asteriaftc", email: "Sosyal Medya DM",
+    sponsors: "Ankara Eğitim ve Teknoloji Sponsorları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 FTC Türkiye Şampiyonası (Ataşehir), 1. Piri Reis Turnuvası",
+    awards: "🏆 2025-2026 FTC Türkiye Şampiyonası: Çaylak (Rookie) sezonunda Türkiye Şampiyonası'na yükselme başarısı (Q-4 maçında #25601 ile aynı maçta yarıştı).",
+    stats: "İlk sezonunda doğrudan Türkiye Şampiyonası'na katılmaya hak kazanan başarılı Ankara takımıdır (#25153 ile birlikte Ankara'nın 2 takımından biri).",
+    chassis: "Mecanum Şasi, Dengeli TeleOp Mekanizmaları",
+    software: "Java Otonom ve Sürücü Kontrolleri",
+    outreach: "Ankara'daki okullarda astronomi, uzay bilimleri ve robotik kesişiminde öğrenci kulübü etkinlikleri yürütmekte; Başkent'te FTC bilinirliğini artırmak için akran sunumları yapmaktadır.",
+    collab: "Ankara'nın iki temsilcisinden biri olan Asteria ile sezon içi tasarım ve yazılım gelişimi üzerine online toplantı yapılabilir.",
+    priority: "Orta-Yüksek - Online Teknik Toplantı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "33650", name: "Tulpar FTC", city: "İstanbul (34)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "İstanbul Merkezli Okul / Kulüp Takımı",
+    web: "-", ig: "@tulparftc", email: "Sosyal Medya DM",
+    sponsors: "İstanbul Yerel Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "2025-2026 DECODE Sezonu Hazırlık ve Bölge Etkinlikleri",
+    awards: "🏆 2025-2026 sezonunda kurulup 2026-2027 BIOBUZZ sezonunda kaydını yenileyen gelişim odaklı İstanbul takımı.",
+    stats: "İkinci sezonunda saha ve jüri performansını artırmayı hedefleyen takım.",
+    chassis: "Mecanum / Kit Şasi",
+    software: "Java / Blocks",
+    outreach: "Okul bünyesinde kodlama ve robotik atölyeleri düzenleyerek yeni öğrencileri FIRST ekosistemiyle tanıştırmakta ve yerli teknoloji üretimi farkındalığı oluşturmaktadır.",
+    collab: "İstanbul turnuvaları öncesinde online tanışma ve BIOBUZZ oyun kuralları üzerine beyin fırtınası yapılabilir.",
+    priority: "Orta - Online Tanışma",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "34173", name: "BorTech", city: "Bor, Niğde (51)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "Niğde Bor Merkezli Okul / Bilim Merkezi Takımı",
+    web: "-", ig: "@bortechftc", email: "Sosyal Medya DM",
+    sponsors: "Niğde / Bor Yerel Kurum ve Eğitim Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 DECODE Sezonu",
+    awards: "🏆 Niğde ilinin aktif FTC temsilcisi olarak 2025 yılında kurulmuş ve 2026-2027 sezonunda da devamlılık sağlamıştır.",
+    stats: "İç Anadolu Bölgesi'nde (Ankara dışında) aktifliğini koruyan tek FTC takımıdır.",
+    chassis: "Kit Tabanlı Şasi, 3D Baskı Parçalar",
+    software: "Java / Blocks",
+    outreach: "Niğde'nin Bor ilçesindeki öğrencilere robotik kodlama ve 3D tasarım eğitimi sunarak İç Anadolu'daki kırsal/ilçe okullarında teknoloji elçiliği yapmaktadır.",
+    collab: "Anadolu'daki takımlarla dayanışma kapsamında Niğde BorTech takımına online CAD/Java atölyesi veya kaynak paylaşımı teklif edilebilir.",
+    priority: "Yüksek - Anadolu Takımlarıyla Outreach & Kaynak Paylaşımı",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "34250", name: "KAISER Jr.", city: "İstanbul (34)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "İstanbul Özel Alman Lisesi (FRC #6989 KAISER Kardeş Takımı)",
+    web: "-", ig: "@kaiserjr34250 / @frc6989", email: "Sosyal Medya DM",
+    sponsors: "Alman Lisesi ve FRC #6989 Kurumsal Sponsorları",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "Şubat 2026 Kadıköy Scrimmage (Saint-Joseph Fransız Lisesi)",
+    awards: "🏆 Şubat 2026 Kadıköy Scrimmage: Q-2 maçında 127-60, Q-10 maçında 83-63'lük yüksek skorlu galibiyetler elde etmiştir.",
+    stats: "Köklü FRC takımı #6989 KAISER'in mühendislik ve mentörlük altyapısıyla kurulan çok güçlü bir genç takımdır.",
+    chassis: "Özel Üretim Destekli Mecanum Şasi, FRC Standartlarında İşçilik",
+    software: "Gelişmiş Java Otonom ve Sürücü Kontrolleri",
+    outreach: "Alman Lisesi FRC #6989 KAISER takımıyla birlikte hazırlık ve 9. sınıf öğrencilerine yönelik mühendislik, CAD ve yazılım kampları düzenlemekte; Almanca/Türkçe/İngilizce çok dilli STEM eğitim içerikleri üretmektedir.",
+    collab: "Kadıköy Scrimmage'daki yüksek skorları dikkat çekicidir. Turnuvada güçlü bir ittifak ortağı adayıdır; öncesinde tanışma toplantısı yapılmalıdır.",
+    priority: "Yüksek - Saha İttifak Adayı & Teknik Paylaşım",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "34313", name: "Berçelan Robotics", city: "Çukurca, Hakkari (30)", rookie: "2025", status: "Veteran (2. Sezon)",
+    org: "Hakkari Çukurca Merkezli Okul / Gençlik Takımı",
+    web: "-", ig: "@bercelanrobotics", email: "Sosyal Medya DM / Çukurca MEB",
+    sponsors: "Çukurca Kaymakamlığı / MEB ve Fikret Yüksel Vakfı Destekleri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "2025-2026 DECODE Sezonu",
+    awards: "🏆 Türkiye'nin en doğusundaki sınır ilçemiz Hakkari Çukurca'da kurulan ve 2026-2027 sezonunda da kaydını sürdüren ilham verici FTC takımıdır.",
+    stats: "Türkiye'nin en uzak noktasından (Hakkari Çukurca) FTC ekosistemine katılan çok özel bir takımdır.",
+    chassis: "FTC Başlangıç Kiti Şasisi",
+    software: "Blocks / Java Temel Programlama",
+    outreach: "Irak sınırındaki Hakkari Çukurca ilçesinde öğrencileri ilk kez ileri seviye robotik kitleriyle buluşturmuş, ilçedeki okullarda bilim şenlikleri yaparak sınır bölgesindeki çocukların mühendislik hayallerine öncülük etmiştir.",
+    collab: "İzmir Güzelbahçe'den Hakkari Çukurca'ya 'Batıdan Doğuya Bilim Köprüsü' projesi başlatarak onlara 3D baskı robot parçaları, eğitim modülleri ve mentörlük desteği sunmak sezonun en anlamlı Outreach projesi olacaktır!",
+    priority: "Çok Yüksek - 1 Numaralı Sosyal Etki (Outreach) & Kardeş Takım Hedefi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "36427", name: "ODTÜmus Prime", city: "İzmir (35)", rookie: "2026", status: "Rookie (1. Sezon - Kardeş Takımımız)",
+    org: "ODTÜ Geliştirme Vakfı Özel İzmir Okulları",
+    web: "https://odtumusprime.com", ig: "@odtumusprime25601", email: "odtumusprime.com",
+    sponsors: "ODTÜ Geliştirme Vakfı Okulları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "İlk Sezonu (Rookie - 2026)",
+    awards: "🏆 2026-2027 BIOBUZZ sezonunda #25601 ODTÜmus Prime ekosisteminin büyümesiyle kurulan yeni kardeş takım kaydımızdır.",
+    stats: "İlk Sezonu (Rookie). Ana takım #25601 ile aynı atölye ve mentörlük çatısını paylaşmaktadır.",
+    chassis: "goBILDA / REV Ekosistemi, 3D CAD Tasarım Bileşenleri",
+    software: "Java & Android Studio",
+    outreach: "ODTÜ GV Özel İzmir Ortaokulu bünyesinde daha fazla öğrencinin aktif robotik, CAD ve yazılım deneyimi kazanması amacıyla kurulan kurum içi kardeş takım yapılanmasıdır.",
+    collab: "Kendi kurum içi kardeş takımımızdır.",
+    priority: "Kurum İçi Kardeş Takımımız",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37144", name: "Teknodinamik", city: "İstanbul (34)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "İstanbul Merkezli Yeni Okul / Kulüp Takımı",
+    web: "-", ig: "@teknodinamikftc", email: "Turnuva / Sosyal Medya İletişimi",
+    sponsors: "Yeni Sezon Sponsor Çalışmaları Devam Ediyor",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş turnuva/ödül kaydı yoktur)",
+    awards: "🏆 2026-2027 BIOBUZZ sezonunda ilk kez kurulan Çaylak (Rookie) takımdır.",
+    stats: "İlk resmi maçlarına Aralık 2026'da çıkacaktır.",
+    chassis: "Rookie Kit Şasisi (Tahmini REV / goBILDA)",
+    software: "Java / Blocks Başlangıç Seviyesi",
+    outreach: "Yeni kurulan çaylak takım olarak okul içinde FIRST değerlerini tanıtma, takım organizasyonu kurma ve ilk kez STEM/robotik yarışmalarına katılacak öğrencileri yetiştirme çalışmaları yürütmektedir.",
+    collab: "Çaylak (Rookie) takım olması sebebiyle 'FTC'ye Hoş Geldiniz Paketi' (Türkçe kılavuz özetleri, örnek Mühendislik Portfolyosu şablonu ve yazılım başlangıç rehberi) gönderilerek online mentörlük teklif edilebilir.",
+    priority: "Yüksek - Rookie Takım Mentörlüğü Hedefi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37224", name: "Trial of Allegiance", city: "İstanbul (34)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "İstanbul Merkezli İkiz Takım Yapılanması (#37225 ile Kardeş Takım)",
+    web: "https://trialofallegiance.com/", ig: "@trialofallegiance", email: "trialofallegiance.com",
+    sponsors: "Yeni Sezon Kurumsal Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş turnuva/ödül kaydı yoktur)",
+    awards: "🏆 2026-2027 BIOBUZZ sezonunda #37225 ile birlikte ikiz takım olarak kurulan Çaylak (Rookie) takımdır.",
+    stats: "Web siteleri aktif olan, jüri ödülleri ve topluluk projelerine odaklı iddialı bir çaylak yapılanmadır.",
+    chassis: "Modüler Mecanum Şasi (Tasarım Aşamasında)",
+    software: "Java & Görüntü İşleme Hazırlığı",
+    outreach: "Çaylak sezonlarında #37224 ve #37225 olarak ikiz takım modeli kurmuş, resmi web siteleri (trialofallegiance.com) üzerinden açık kaynak bilgi paylaşımı ve sosyal sorumluluk projeleri başlatmıştır.",
+    collab: "Web siteleri (trialofallegiance.com) üzerinden doğrudan iletişime geçilerek hem kendi çoklu takım yapımız (#25601/#36427/#37620) hem de onların ikiz takım yapısı (#37224/#37225) üzerine ortak bir online toplantı düzenlenebilir.",
+    priority: "Çok Yüksek - Aktif Web/Sosyal Medya & Rookie İş Birliği",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37225", name: "Trial of Allegiance", city: "İstanbul (34)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "İstanbul Merkezli İkiz Takım Yapılanması (#37224 ile Kardeş Takım)",
+    web: "https://trialofallegiance.com/", ig: "@trialofallegiance", email: "trialofallegiance.com",
+    sponsors: "Yeni Sezon Kurumsal Destekçileri",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş turnuva/ödül kaydı yoktur)",
+    awards: "🏆 2026-2027 BIOBUZZ sezonunda #37224 ile birlikte kurulan ikinci Çaylak (Rookie) takımdır.",
+    stats: "İlk sezonunda saha ve jüri ödüllerini hedefleyen organize çaylak takım.",
+    chassis: "Modüler Mecanum Şasi",
+    software: "Java Otonom ve TeleOp",
+    outreach: "#37224 kardeş takımıyla ortaklaşa akran eğitimi, STEM seminerleri ve yeni başlayan takımlar için dijital kaynak üretimi çalışmaları yürütmektedir.",
+    collab: "#37224 ile yapılacak ortak tanışma toplantısına her iki kardeş takım da dahil edilerek çoklu takım mentörlüğü gerçekleştirilebilir.",
+    priority: "Yüksek - Rookie İkiz Takım Etkileşimi",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37308", name: "ibbtech", city: "İstanbul (34)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "İstanbul Büyükşehir Belediyesi (İBB) Teknoloji Atölyeleri",
+    web: "https://teknolojiatolyeleri.ibb.ist/", ig: "@ibbteknolojiatolyeleri", email: "İBB Teknoloji Atölyeleri İletişim",
+    sponsors: "İstanbul Büyükşehir Belediyesi (İBB)",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş FTC turnuva kaydı yoktur; FRC/Teknofest altyapısı mevcuttur)",
+    awards: "🏆 İBB Teknoloji Atölyeleri bünyesinde 2026-2027 BIOBUZZ sezonu için kurulan yeni FTC takımıdır.",
+    stats: "Belediye teknoloji atölyelerinden seçilen öğrencilerle kurulan güçlü kurumsal destekli çaylak takım.",
+    chassis: "Atölye Üretimi Destekli Mecanum Şasi",
+    software: "Java / Python Tabanlı Algoritma Deneyimi",
+    outreach: "İstanbul Büyükşehir Belediyesi'nin kentin farklı ilçelerindeki Teknoloji Atölyeleri'nde binlerce ilkokul, ortaokul ve lise öğrencisine sunduğu ücretsiz robotik, yapay zeka ve tasarım eğitimlerinin FTC yarışma takımını oluşturmaktadır.",
+    collab: "İBB Teknoloji Atölyeleri'nin ilk FTC sezonunda onlara FTC Jüri Süreçleri ve Mühendislik Portfolyosu formatı hakkında deneyim paylaşımı sunmak harika bir kurumsal bağ kuracaktır.",
+    priority: "Yüksek - Kamu Teknoloji Atölyesi & Rookie Mentörlüğü",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37395", name: "NEXIS JR.", city: "Şişli, İstanbul (34)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "Şişli Merkezli Okul / FRC Kardeş Takımı",
+    web: "-", ig: "@nexisjr37395", email: "Sosyal Medya DM",
+    sponsors: "Okul ve Kurumsal Destekçiler",
+    events2026: ["1. Hisar Turnuvası (5 Aralık 2026)", "2. Hisar Turnuvası (6 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş turnuva/ödül kaydı yoktur)",
+    awards: "🏆 2026-2027 BIOBUZZ sezonunda 'JR.' yapılanmasıyla ortaokul/alt kademe öğrencileri için kurulan yeni çaylak takımdır.",
+    stats: "İlk resmi turnuvasına Aralık 2026'da çıkacaktır.",
+    chassis: "Mecanum / Kit Şasi",
+    software: "Java / Blocks",
+    outreach: "Lise kademesindeki abla/ağabey takımın mentörlüğünde Şişli bölgesindeki ortaokul öğrencilerini erken yaşta mühendislik, CAD ve yarışma kültürüyle yetiştirmek üzere kurulmuştur.",
+    collab: "Ortaokul yaş grubuna hitap eden bir 'Jr.' takım olması sebebiyle öğrencilerimiz arasında akran tanışma toplantısı organize edilebilir.",
+    priority: "Orta-Yüksek - Rookie Akran Buluşması",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37620", name: "ODTÜmus Prime", city: "İzmir (35)", rookie: "2026", status: "Rookie (1. Sezon - Kardeş Takımımız)",
+    org: "ODTÜ Geliştirme Vakfı Özel İzmir Okulları",
+    web: "https://odtumusprime.com", ig: "@odtumusprime25601", email: "odtumusprime.com",
+    sponsors: "ODTÜ Geliştirme Vakfı Okulları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "İlk Sezonu (Rookie - 2026)",
+    awards: "🏆 2026-2027 BIOBUZZ sezonunda ODTÜ GV Özel İzmir Okulları bünyesinde açılan üçüncü takım kaydımızdır.",
+    stats: "İlk Sezonu (Rookie). #25601 ve #36427 ile aynı ekosistemde yer almaktadır.",
+    chassis: "goBILDA / REV Ekosistemi",
+    software: "Java & Android Studio",
+    outreach: "ODTÜmus Prime çatısı altında daha fazla ortaokul öğrencisinin uluslararası robotik turnuvalarında deneyim kazanmasını sağlayan genişleme projemizdir.",
+    collab: "Kendi kurum içi kardeş takımımızdır.",
+    priority: "Kurum İçi Kardeş Takımımız",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37621", name: "Tech Enthusiast Team", city: "Çiftlikköy, Yalova (77)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "Yalova Çiftlikköy Merkezli Okul / Topluluk Takımı",
+    web: "-", ig: "@techenthusiastftc", email: "Sosyal Medya / Pit İletişimi",
+    sponsors: "Yalova Yerel Eğitim Destekçileri",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş turnuva/ödül kaydı yoktur)",
+    awards: "🏆 Yalova ilinin (77) FTC tarihindeki ilk ve tek aktif temsilcisi olarak 2026-2027 sezonunda kurulmuştur.",
+    stats: "Yeni bir şehri (Yalova) FTC haritasına ekleyen öncü çaylak takım.",
+    chassis: "Başlangıç Kiti Şasisi",
+    software: "Blocks / Java Başlangıç",
+    outreach: "Yalova ilinde kurulan ilk FTC takımı olarak Çiftlikköy ve Yalova genelindeki okullarda FIRST programlarını tanıtmakta, şehirde robotik ekosisteminin temelini atmaktadır.",
+    collab: "Yalova'nın ilk FTC takımı olmaları sebebiyle onlara 'Rookie Rehberi' ve online teknik mentörlük desteği vermek hem onlar için büyük kolaylık sağlar hem de portfolyomuzda güçlü bir etki yaratır.",
+    priority: "Yüksek - Yeni Şehir (Yalova) Rookie Mentörlüğü",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  },
+  {
+    num: "37677", name: "Qubit Robotics", city: "İstanbul (34)", rookie: "2026", status: "Rookie (1. Sezon - Çaylak)",
+    org: "İstanbul Merkezli Yeni Okul / Kulüp Takımı",
+    web: "-", ig: "@qubitroboticsftc", email: "Sosyal Medya DM",
+    sponsors: "Yeni Sezon Sponsorluk Çalışmaları",
+    events2026: ["1. Piri Reis Turnuvası (19 Aralık 2026)", "2. Piri Reis Turnuvası (20 Aralık 2026)"],
+    events2025: "İlk Sezonu (2026-2027 BIOBUZZ Rookie Takımı - Geçmiş turnuva/ödül kaydı yoktur)",
+    awards: "🏆 Türkiye bölgesinde 2026-2027 sezonunda kaydolan en yeni (en yüksek numaralı: #37677) Çaylak (Rookie) takımdır.",
+    stats: "İlk resmi maçlarına Aralık 2026'da çıkacaktır.",
+    chassis: "Kit Tabanlı Şasi (Tasarım/Montaj Aşamasında)",
+    software: "Java / Blocks",
+    outreach: "Yeni kurulan çaylak takım olarak okul çevresinde kuantum bilişim, kodlama ve robotik kulübü etkinlikleri başlatarak genç öğrencileri STEM alanına yönlendirmektedir.",
+    collab: "Listeye en son eklenen çaylak takım olan Qubit Robotics'e 'Hoş Geldin' mesajı gönderilerek turnuva öncesi hazırlık sürecinde ihtiyaç duydukları CAD/Yazılım kaynakları paylaşılabilir.",
+    priority: "Yüksek - En Yeni Rookie Takım Mentörlüğü",
+    contactNote: "", notes1: "", notes2: "", checks: {}, ratings: {}
+  }
+];
+
+let teams = JSON.parse(localStorage.getItem("odtumus_scouting_v4")) || defaultTeams;
+
+function saveTeams() {
+  localStorage.setItem("odtumus_scouting_v4", JSON.stringify(teams));
+  const badge = document.getElementById("saveStatus");
+  if (badge) {
+    badge.textContent = "💾 Kaydedildi (" + new Date().toLocaleTimeString("tr-TR", {hour:'2-digit', minute:'2-digit'}) + ")";
+  }
+}
+
+// Doldurulabilir metin alanları değiştiğinde kaydet
+function updateField(teamNum, field, el) {
+  const t = teams.find(x => x.num === teamNum);
+  if (!t) return;
+  t[field] = el.innerHTML;
+  saveTeams();
+}
+
+// Tıklanabilir Checkbox durumu değiştiğinde kaydet
+function toggleCheck(teamNum, checkKey, el) {
+  const t = teams.find(x => x.num === teamNum);
+  if (!t) return;
+  if (!t.checks) t.checks = {};
+  t.checks[checkKey] = !t.checks[checkKey];
+  const sq = el.querySelector(".square");
+  if (t.checks[checkKey]) sq.classList.add("checked");
+  else sq.classList.remove("checked");
+  saveTeams();
+}
+
+// 1-5 Derecelendirme butonuna tıklandığında kaydet
+function setRating(teamNum, rateKey, val, containerEl) {
+  const t = teams.find(x => x.num === teamNum);
+  if (!t) return;
+  if (!t.ratings) t.ratings = {};
+  t.ratings[rateKey] = val;
+  const btns = containerEl.querySelectorAll(".rate-btn");
+  btns.forEach((b, idx) => {
+    if (idx + 1 === val) b.classList.add("active");
+    else b.classList.remove("active");
+  });
+  saveTeams();
+}
+
+function renderCheck(t, key, label) {
+  const isChecked = t.checks && t.checks[key] ? "checked" : "";
+  return `<span class="chk" onclick="toggleCheck('${t.num}', '${key}', this)"><span class="square ${isChecked}"></span> ${label}</span>`;
+}
+
+function renderRateGroup(t, key) {
+  const cur = (t.ratings && t.ratings[key]) || 0;
+  let html = `<div class="rate-group">`;
+  for (let i = 1; i <= 5; i++) {
+    const act = cur === i ? "active" : "";
+    html += `<span class="rate-btn ${act}" onclick="setRating('${t.num}', '${key}', ${i}, this.parentElement)">${i}</span>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderAllTeams(filterNum = "all") {
+  const container = document.getElementById("pagesContainer");
+  container.innerHTML = "";
+
+  const filtered = filterNum === "all" ? teams : teams.filter(t => t.num === filterNum);
+
+  filtered.forEach((t) => {
+    if (!t.checks) t.checks = {};
+    if (!t.ratings) t.ratings = {};
+
+    const isRookie = t.rookie === "2026";
+    const statusTag = isRookie
+      ? `<span class="tag tag-rookie">ROOKIE (2026)</span>`
+      : `<span class="tag tag-vet">VETERAN (${t.rookie})</span>`;
+
+    const eventsPills = (t.events2026 && t.events2026.length > 0)
+      ? t.events2026.map(ev => {
+          const isHisar = ev.includes("Hisar");
+          return `<span class="event-pill ${isHisar ? 'hisar' : ''}">📍 ${ev}</span>`;
+        }).join(" ")
+      : `<span class="event-pill">Atama Bekleniyor</span>`;
+
+    // SAYFA 1
+    const page1 = document.createElement("div");
+    page1.className = "page";
+    page1.innerHTML = `
+      <div>
+        <div class="header-banner">
+          <div class="header-title">
+            <h2>FIRST TECH CHALLENGE – TAKIM ARAŞTIRMA & ANALİZ DOSYASI</h2>
+            <p>2026-2027 BIOBUZZ Sezonu Türkiye (TR) Bölgesi | Hazırlayan: #25601 ODTÜmus Prime (Tüm Alanlar Düzenlenebilir)</p>
+          </div>
+          <div class="team-badge">
+            <div class="num">#${t.num}</div>
+            <div class="page-ind">Sayfa 1 / 2 • Kurumsal & Geçmiş</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>1. TAKIM KİMLİK KARTI VE KURUMSAL PROFİL</span>
+          ${statusTag}
+        </div>
+        <table class="info-table">
+          <tr>
+            <th>Takım Numarası & Adı</th>
+            <td><strong>#${t.num} – <span contenteditable="true" onblur="updateField('${t.num}','name',this)">${t.name}</span></strong></td>
+            <th>İl / İlçe (Bölge)</th>
+            <td><strong contenteditable="true" onblur="updateField('${t.num}','city',this)">${t.city}</strong></td>
+          </tr>
+          <tr>
+            <th>Kuruluş Yılı (Rookie Year)</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','status',this)">${t.status}</td>
+            <th>Bağlı Olduğu Kurum / Tür</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','org',this)">${t.org}</td>
+          </tr>
+          <tr>
+            <th>Ana Sponsorlar & Destekçiler</th>
+            <td colspan="3" contenteditable="true" onblur="updateField('${t.num}','sponsors',this)">${t.sponsors}</td>
+          </tr>
+        </table>
+
+        <div class="section-title">
+          <span>2. DİJİTAL VARLIKLAR, İLETİŞİM BİLGİLERİ VE TAKİP ÇİZELGESİ</span>
+        </div>
+        <table class="info-table">
+          <tr>
+            <th>Resmi Web Sitesi</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','web',this)">${t.web}</td>
+            <th>Instagram / Sosyal Medya</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','ig',this)">${t.ig}</td>
+          </tr>
+          <tr>
+            <th>E-Posta / İletişim & Link</th>
+            <td>
+              <div contenteditable="true" onblur="updateField('${t.num}','email',this)">${t.email}</div>
+              <a class="official-link" href="https://ftc-events.firstinspires.org/2026/team/${t.num}" target="_blank">🔗 Resmi FIRST 2026 Sayfası ↗</a>
+            </td>
+            <th>Outreach Öncelik Seviyesi</th>
+            <td><strong contenteditable="true" onblur="updateField('${t.num}','priority',this)">${t.priority}</strong></td>
+          </tr>
+        </table>
+        <div class="box box-fill" style="margin-bottom:5px;">
+          <div class="chk-row">
+            <span><strong>İletişim Durumu:</strong></span>
+            ${renderCheck(t, 'c_msg', 'İlk Mesaj Gönderildi')}
+            ${renderCheck(t, 'c_reply', 'Dönüş Alındı')}
+            ${renderCheck(t, 'c_meet', 'Online Toplantı Yapıldı')}
+            ${renderCheck(t, 'c_pit', 'Yüz Yüze / Pit Görüşmesi Yapıldı')}
+          </div>
+          <div style="font-size:10px; color:#334155; margin-top:3px; display:flex; gap:5px; align-items:center;">
+            <strong>Görüşülen Kişi / Tarih / Not:</strong>
+            <div contenteditable="true" data-placeholder="Buraya tıklayarak görüşme notu ekleyin..." onblur="updateField('${t.num}','contactNote',this)" style="flex:1; border-bottom:1px dashed #94a3b8; padding:1px 4px;">${t.contactNote || ''}</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>3. TURNUVA TAKVİMİ (BU SEZON VE GEÇMİŞ SEZONLAR)</span>
+        </div>
+        <table class="info-table">
+          <tr>
+            <th>Bu Yıl Katılacağı Turnuvalar<br>(2026-2027 BIOBUZZ)</th>
+            <td>${eventsPills}</td>
+          </tr>
+          <tr>
+            <th>Geçen Yıllarda Katıldığı<br>Turnuvalar</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','events2025',this)">${t.events2025}</td>
+          </tr>
+        </table>
+
+        <div class="section-title">
+          <span>4. KAZANDIĞI ÖDÜLLER, DERECELER VE SAHA İSTATİSTİKLERİ (OPR / SIRALAMA)</span>
+        </div>
+        <div class="box" style="margin-bottom:5px;">
+          <h4>Resmi Ödül, İttifak ve Derece Kayıtları (Düzenlemek için metne tıklayın)</h4>
+          <div contenteditable="true" onblur="updateField('${t.num}','awards',this)" style="line-height:1.5;">${t.awards}</div>
+        </div>
+        <div class="box box-fill">
+          <h4>Performans & Saha İstatistik Özeti (FTCScout / FIRST Veri Analizi)</h4>
+          <div contenteditable="true" onblur="updateField('${t.num}','stats',this)">${t.stats}</div>
+        </div>
+
+        <div class="section-title">
+          <span>5. ÖĞRENCİ ARAŞTIRMA EKİBİ EK NOTLARI (SAYFA 1 - DOLDURULABİLİR ALAN)</span>
+        </div>
+        <div class="notes-lines" contenteditable="true" data-placeholder="Öğrenciler bu alana tıklayarak takım hakkındaki ek araştırma notlarını doğrudan yazabilir..." onblur="updateField('${t.num}','notes1',this)">${t.notes1 || ''}</div>
+      </div>
+
+      <div class="footer-bar">
+        <span>FTC #25601 ODTÜmus Prime – "We Build, We Learn, We Inspire."</span>
+        <span>Takım Dosyası: #${t.num} ${t.name}</span>
+        <span>Sayfa 1 / 2</span>
+      </div>
+    `;
+
+    // SAYFA 2
+    const page2 = document.createElement("div");
+    page2.className = "page";
+    page2.innerHTML = `
+      <div>
+        <div class="header-banner">
+          <div class="header-title">
+            <h2>TEKNİK SCOUTING, OUTREACH VE İŞ BİRLİĞİ STRATEJİ FORMU</h2>
+            <p>Takım Analizi, Saha İçi Yetkinlik Değerlendirmesi ve Ortak Çalışma Planı (Tıklanabilir & Doldurulabilir)</p>
+          </div>
+          <div class="team-badge">
+            <div class="num">#${t.num}</div>
+            <div class="page-ind">Sayfa 2 / 2 • Teknik & İş Birliği</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>6. ÖN TEKNİK SCOUTING (DONANIM, ŞASİ VE YAZILIM PROFİLİ)</span>
+        </div>
+        <table class="info-table">
+          <tr>
+            <th>Şasi & Mekanik Altyapı<br>(Tahmini / Bilinen)</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','chassis',this)">${t.chassis}</td>
+          </tr>
+          <tr>
+            <th>Yazılım, Otonom & Sensörler<br>(Tahmini / Bilinen)</th>
+            <td contenteditable="true" onblur="updateField('${t.num}','software',this)">${t.software}</td>
+          </tr>
+        </table>
+
+        <div class="grid-2">
+          <div class="box">
+            <h4>Turnuva İçi Donanım Gözlem Listesi (Pit Scouting)</h4>
+            <div class="chk-row" style="flex-direction:column; gap:4px;">
+              <div>
+                ${renderCheck(t, 'hw_mec', 'Mecanum Drive')} &nbsp;
+                ${renderCheck(t, 'hw_tank', 'Tank')} &nbsp;
+                ${renderCheck(t, 'hw_swerve', 'Swerve')}
+              </div>
+              <div>
+                ${renderCheck(t, 'hw_gobilda', 'goBILDA')} &nbsp;
+                ${renderCheck(t, 'hw_rev', 'REV')} &nbsp;
+                ${renderCheck(t, 'hw_cnc', 'Özel CNC / 3D Baskı')}
+              </div>
+              ${renderCheck(t, 'hw_intake', 'Aktif Intake (Toplama) Mekanizması')}
+              ${renderCheck(t, 'hw_slide', 'Linear Slide / Asansör / Kol Sistemi')}
+              ${renderCheck(t, 'hw_endgame', 'Endgame (Oyun Sonu) Tırmanma/Park Yeteneği')}
+            </div>
+          </div>
+          <div class="box">
+            <h4>Turnuva İçi Yazılım & Otonom Gözlem Listesi</h4>
+            <div class="chk-row" style="flex-direction:column; gap:4px;">
+              <div>
+                ${renderCheck(t, 'sw_java', 'Java (AS)')} &nbsp;
+                ${renderCheck(t, 'sw_onbot', 'OnBot Java')} &nbsp;
+                ${renderCheck(t, 'sw_blocks', 'Blocks')}
+              </div>
+              ${renderCheck(t, 'sw_vision', 'Kamera / Limelight / AprilTag Algılama')}
+              ${renderCheck(t, 'sw_odo', 'Dead Wheel Odometry / RoadRunner / PedroPathing')}
+              ${renderCheck(t, 'sw_autoscore', 'Otonomda Skorlama Yapabiliyor mu?')}
+              ${renderCheck(t, 'sw_autostart', 'Otonom Başlangıç Pozisyonu Esnekliği (Sağ/Sol)')}
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>7. OUTREACH (SOSYAL ETKİ) VE KURUMSAL KÜLTÜR ANALİZİ</span>
+        </div>
+        <div class="box" style="margin-bottom:5px;">
+          <h4>Takımın Öne Çıkan Outreach / Topluluk Çalışmaları (Detaylı Özet)</h4>
+          <div contenteditable="true" onblur="updateField('${t.num}','outreach',this)">${t.outreach}</div>
+        </div>
+
+        <div class="section-title">
+          <span>8. #25601 ODTÜMUS PRIME İLE İŞ BİRLİĞİ (COLLABORATION) PLANI</span>
+        </div>
+        <div class="box box-fill" style="margin-bottom:5px;">
+          <h4>Önerilen Stratejik Eylem ve Ortak Proje Fikri</h4>
+          <div contenteditable="true" onblur="updateField('${t.num}','collab',this)">${t.collab}</div>
+          <div class="chk-row" style="margin-top:5px; border-top:1px solid #cbd5e1; padding-top:4px;">
+            ${renderCheck(t, 'col_meet', 'Online Tanışma Toplantısı')}
+            ${renderCheck(t, 'col_scrim', 'Ortak Scrimmage / Antrenman')}
+            ${renderCheck(t, 'col_mentor', 'Rookie / Teknik Mentörlük')}
+            ${renderCheck(t, 'col_share', 'CAD / Kod / Parça Paylaşımı')}
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>9. İTTİFAK SEÇİMİ (ALLIANCE SELECTION) DEĞERLENDİRME MATRİSİ</span>
+        </div>
+        <table class="info-table">
+          <tr>
+            <th>Otonom Kararlılığı (1-5)</th>
+            <td>${renderRateGroup(t, 'r_auto')}</td>
+            <th>TeleOp Hızı / Cycle (1-5)</th>
+            <td>${renderRateGroup(t, 'r_teleop')}</td>
+          </tr>
+          <tr>
+            <th>Mekanik Dayanıklılık (1-5)</th>
+            <td>${renderRateGroup(t, 'r_mech')}</td>
+            <th>Takım İletişimi / GP (1-5)</th>
+            <td>${renderRateGroup(t, 'r_gp')}</td>
+          </tr>
+          <tr>
+            <th>Bizim Robotumuzla Uyumu</th>
+            <td colspan="3">
+              ${renderCheck(t, 'fit_comp', 'Tamamlayıcı (Çok Uygun)')} &nbsp;&nbsp;
+              ${renderCheck(t, 'fit_same', 'Benzer Görev Yapar')} &nbsp;&nbsp;
+              ${renderCheck(t, 'fit_dev', 'Gelişime Açık')}
+            </td>
+          </tr>
+        </table>
+
+        <div class="section-title">
+          <span>10. TURNUVA GÜNÜ MAÇ & PİT GÖZLEM NOTLARI (SAYFA 2 - DOLDURULABİLİR ALAN)</span>
+        </div>
+        <div class="notes-lines" style="height:85px;" contenteditable="true" data-placeholder="Turnuva günü pit ziyareti ve maç gözlem notlarını buraya tıklayarak yazabilirsiniz..." onblur="updateField('${t.num}','notes2',this)">${t.notes2 || ''}</div>
+      </div>
+
+      <div class="footer-bar">
+        <span>FTC #25601 ODTÜmus Prime – Scouting & Outreach Birimi</span>
+        <span>Takım Dosyası: #${t.num} ${t.name}</span>
+        <span>Sayfa 2 / 2</span>
+      </div>
+    `;
+
+    container.appendChild(page1);
+    container.appendChild(page2);
+  });
+}
+
+function populateDropdown() {
+  const sel = document.getElementById("teamFilter");
+  sel.innerHTML = `<option value="all">Tüm Takımları Göster (35 Takım - 70 Sayfa)</option>`;
+  teams.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.num;
+    opt.textContent = `#${t.num} - ${t.name} (${t.city})`;
+    sel.appendChild(opt);
+  });
+}
+
+function onTeamSelect() {
+  const val = document.getElementById("teamFilter").value;
+  const editorBox = document.getElementById("eventEditorBox");
+
+  if (val === "all") {
+    editorBox.style.display = "none";
+  } else {
+    editorBox.style.display = "flex";
+    const teamObj = teams.find(t => t.num === val);
+    const checkboxes = editorBox.querySelectorAll("input[type='checkbox']");
+    checkboxes.forEach(cb => {
+      cb.checked = teamObj.events2026.includes(cb.value);
+    });
+  }
+  renderAllTeams(val);
+}
+
+function updateTeamEvents() {
+  const val = document.getElementById("teamFilter").value;
+  if (val === "all") return;
+  const teamObj = teams.find(t => t.num === val);
+  const editorBox = document.getElementById("eventEditorBox");
+  const checkboxes = editorBox.querySelectorAll("input[type='checkbox']");
+  const selected = [];
+  checkboxes.forEach(cb => {
+    if (cb.checked) selected.push(cb.value);
+  });
+  teamObj.events2026 = selected;
+  saveTeams();
+  renderAllTeams(val);
+}
+
+// JSON Yedek İndirme & Yükleme
+function exportJSON() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(teams, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", "odtumusprime_scouting_yedek.json");
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        teams = imported;
+        saveTeams();
+        populateDropdown();
+        renderAllTeams(document.getElementById("teamFilter").value);
+        alert("✅ Yedek dosyası başarıyla yüklendi!");
+      }
+    } catch (err) {
+      alert("⚠️ Geçersiz JSON dosyası!");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function openImportModal() {
+  document.getElementById("importModal").style.display = "flex";
+  document.getElementById("importStatus").textContent = "";
+}
+
+function closeImportModal() {
+  document.getElementById("importModal").style.display = "none";
+}
+
+function processBulkImport() {
+  const mapEvents = [
+    { id: "txt_TREYQ1", label: "1. Hisar Turnuvası (5 Aralık 2026)" },
+    { id: "txt_TREYQ2", label: "2. Hisar Turnuvası (6 Aralık 2026)" },
+    { id: "txt_TRTUQ1", label: "1. Piri Reis Turnuvası (19 Aralık 2026)" },
+    { id: "txt_TRTUQ2", label: "2. Piri Reis Turnuvası (20 Aralık 2026)" }
+  ];
+
+  const anyFilled = mapEvents.some(ev => document.getElementById(ev.id).value.trim().length > 0);
+  if (!anyFilled) {
+    document.getElementById("importStatus").style.color = "#dc2626";
+    document.getElementById("importStatus").textContent = "⚠️ Lütfen en az bir turnuva kutusuna sayfa metnini yapıştırın.";
+    return;
+  }
+
+  const teamEventMap = {};
+  teams.forEach(t => { teamEventMap[t.num] = new Set(t.events2026); });
+
+  const allFourFilled = mapEvents.every(ev => document.getElementById(ev.id).value.trim().length > 0);
+  if (allFourFilled) {
+    teams.forEach(t => { teamEventMap[t.num] = new Set(); });
+  } else {
+    mapEvents.forEach(ev => {
+      const raw = document.getElementById(ev.id).value.trim();
+      if (raw.length > 0) {
+        teams.forEach(t => teamEventMap[t.num].delete(ev.label));
+      }
+    });
+  }
+
+  let matchCount = 0;
+  mapEvents.forEach(ev => {
+    const raw = document.getElementById(ev.id).value;
+    if (raw.trim().length > 0) {
+      teams.forEach(t => {
+        const regex = new RegExp("\\b" + t.num + "\\b");
+        if (regex.test(raw)) {
+          teamEventMap[t.num].add(ev.label);
+          matchCount++;
+        }
+      });
+    }
+  });
+
+  teams.forEach(t => {
+    t.events2026 = Array.from(teamEventMap[t.num]);
+  });
+
+  saveTeams();
+  renderAllTeams(document.getElementById("teamFilter").value);
+
+  document.getElementById("importStatus").style.color = "#166534";
+  document.getElementById("importStatus").textContent = `✅ Başarılı! Toplam ${matchCount} turnuva-takım eşleşmesi belgelere işlendi.`;
+}
+
+populateDropdown();
+renderAllTeams("all");
+</script>
+</body>
+</html>
