@@ -138,3 +138,6 @@ function modules(): array {
   ];
 
 }
+
+function fin_categories(): array { return ['Nakdi sponsor', 'Ayni destek', 'Bağış', 'Etkinlik geliri', 'Malzeme', 'Turnuva', 'Baskı / forma', 'Ulaşım ve konaklama', 'Yemek', 'Diğer']; }
+function fin_methods(): array { return ['Nakit', 'Havale / EFT', 'Kart', 'Ayni (malzeme)', 'Diğer']; }
