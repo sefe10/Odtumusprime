@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bumblebee'nin Bahçesi • Kodlama Macerası | ODTÜmus Prime #25601</title>
+<meta name="description" content="Blok kodlamayla robot arı Bumblebee'yi yönet! FIRST Tech Challenge'a giriş niteliğinde, 40-60 dakikalık eğlenceli kodlama oyunu.">
+<link rel="icon" href="/assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Fredoka','Baloo 2','Nunito','Segoe UI',system-ui,sans-serif;color:#23304A;background:linear-gradient(180deg,#8FDBFF 0%,#CFF3FF 45%,#C9F4A6 100%) fixed;min-height:100vh;-webkit-tap-highlight-color:transparent}
+.hidden{display:none!important}
+.wrap{max-width:1200px;margin:0 auto;padding:14px;position:relative}
+.center{display:flex;flex-direction:column;align-items:center}
+.card{background:#fff;border-radius:24px;padding:16px;box-shadow:0 6px 0 rgba(30,90,140,.15),0 16px 30px rgba(30,110,170,.15)}
+h1{font-size:clamp(30px,6vw,52px);margin:6px 0;color:#FF7A00;text-shadow:0 3px 0 #FFE08A}
+h2{margin:0;font-size:22px}
+h3{margin:14px 0 6px}
+.back{align-self:flex-start;color:#1B6FD1;font-weight:600;text-decoration:none;margin-bottom:8px}
+.hero{max-width:820px;width:100%;text-align:center;padding:26px}
+.bigbee{font-size:84px;animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-12px) rotate(4deg)}}
+.sub{font-size:19px;line-height:1.5}
+.sky span{position:fixed;font-size:56px;opacity:.85;animation:bob 5s ease-in-out infinite;pointer-events:none}
+.btn{border:0;border-radius:16px;padding:11px 18px;font-family:inherit;font-weight:600;font-size:17px;color:#fff;background:#2F9BFF;box-shadow:0 5px 0 #1B6FD1;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1B6FD1}
+.btn.go{background:#22C55E;box-shadow:0 5px 0 #138A3F}
+.btn.stop{background:#FF4D6D;box-shadow:0 5px 0 #C22A47}
+.btn.alt{background:#FF9F1C;box-shadow:0 5px 0 #C27200}
+.btn.pur{background:#8B5CF6;box-shadow:0 5px 0 #5B34C4}
+.btn.big{font-size:24px;padding:14px 34px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.mini{background:none;border:0;color:#1B6FD1;font-family:inherit;font-weight:600;cursor:pointer;text-decoration:underline;font-size:14px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.dcard{border:4px solid #E3EEF7;background:#fff;border-radius:20px;padding:14px;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px;align-items:center;color:#23304A}
+.dcard.sel{border-color:#FF9F1C;background:#FFF6DD;transform:scale(1.04)}
+.dcard .de{font-size:38px}.dcard small{font-size:13px;color:#566}
+.ftc{margin-top:22px;text-align:left;background:#F2FBFF;border-radius:18px;padding:14px 18px}
+.ftc .trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0}
+.ftc .trio div{background:#fff;border-radius:14px;padding:10px;text-align:center;font-weight:600}
+.ftc a,.cta a{color:#1B6FD1;font-weight:600}
+.top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 14px}
+.brand{text-decoration:none;color:#FF7A00;font-size:20px}
+.dots{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.dot{width:42px;height:46px;border:3px solid #E3EEF7;border-radius:14px;background:#fff;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer;line-height:1;padding:2px;color:#23304A}
+.dot small{display:block;font-size:10px;color:#F5A500;height:11px}
+.dot.cur{border-color:#FF9F1C;background:#FFF1C9}
+.dot.lock{opacity:.5;cursor:not-allowed}
+.tools{display:flex;gap:8px;align-items:center}
+.tools select{padding:7px;border-radius:10px;border:2px solid #CFE3F3;font-family:inherit;font-weight:600}
+.pill{background:#FFF1C9;border-radius:20px;padding:6px 12px;font-weight:700}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;align-items:start;margin-top:14px}
+@media(max-width:900px){.stage{grid-template-columns:1fr}}
+.lvhd{display:flex;gap:12px;align-items:center}
+.lvno{background:#FF9F1C;color:#fff;font-weight:700;font-size:26px;width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #C27200}
+.tag{font-size:14px;color:#8B5CF6;font-weight:600}
+#story{margin:10px 0 6px;line-height:1.45}
+.goal{background:#E7FBEF;border-radius:12px;padding:8px 12px;margin:6px 0}
+.wx{background:#E3F4FF;border-radius:12px;padding:6px 12px;margin:6px 0;font-size:14px}
+.board{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;margin:10px auto;border-radius:18px;overflow:hidden;border:5px solid #5AA02C;background:#7ED957}
+.grid{position:absolute;inset:0;display:grid;grid-template:repeat(7,1fr)/repeat(7,1fr);z-index:1}
+.cell{display:flex;align-items:center;justify-content:center;font-size:calc(var(--cell,60px)*.6);line-height:1}
+.cell.a{background:#8BE05A}.cell.b{background:#7BD34B}
+.t-rain{background:#7FB6E8!important}.t-wind{background:#BDEBFF!important}.t-hive{background:#FFE08A!important}.t-goal{background:#FFF3A6!important;box-shadow:inset 0 0 0 3px #FFC400}
+.bee{position:absolute;left:0;top:0;width:calc(100%/7);height:calc(100%/7);transition:transform .35s ease;z-index:5}
+#beeshake{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+#beebody{font-size:calc(var(--cell,60px)*.62);transition:transform .2s;line-height:1}
+.arrow{position:absolute;inset:0;transition:transform .25s}
+.arrow::after{content:'';position:absolute;left:50%;top:1px;transform:translateX(-50%);border:calc(var(--cell,60px)*.1) solid transparent;border-bottom:calc(var(--cell,60px)*.16) solid #FF2D78;border-top:0}
+#beeshake.bump{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.erow{display:flex;align-items:center;gap:8px;font-size:20px;margin:6px 0}
+.ebar{flex:1;height:20px;border-radius:12px;background:#E3EEF7;overflow:hidden}
+.ebar i{display:block;height:100%;width:100%;background:#22C55E;transition:width .3s,background .3s}
+.inv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.ic2{background:#FFFBEA;border-radius:14px;padding:8px 10px;border:2px solid #FFE08A}
+.ic2 b{font-size:18px}.ic2 .n{font-size:24px;font-weight:700;color:#FF7A00}.ic2 small{display:block;font-size:11px;color:#667;line-height:1.2}
+.coder{display:grid;grid-template-columns:190px 1fr;gap:10px}
+@media(max-width:620px){.coder{grid-template-columns:1fr}}
+.pal{background:#F2F8FF;border-radius:16px;padding:8px;max-height:420px;overflow:auto}
+.pcat{font-weight:700;font-size:13px;color:#fff;border-radius:10px;padding:2px 10px;display:inline-block;margin-top:6px}
+.wsbox{background:#FFFDF2;border:3px dashed #FFD35C;border-radius:16px;padding:8px;min-height:380px;max-height:520px;overflow:auto}
+.hat{background:#FF5FA2;color:#fff;font-weight:700;border-radius:14px 14px 4px 4px;padding:8px 14px;display:inline-block;box-shadow:0 4px 0 #C23A78}
+#prog{min-height:60px;margin-top:2px;padding:2px}
+#prog:empty::before{content:'🧩 Blokları buraya sürükle (veya dokun)!'!important;color:#A98F3C;font-size:15px;display:block;padding:14px 4px}
+.blk{margin:6px 0;border-radius:14px;color:#fff;font-weight:600;font-size:16px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;box-shadow:0 4px 0 rgba(0,0,0,.22);position:relative}
+.blk .hd{display:flex;align-items:center;gap:8px;padding:9px 12px;flex-wrap:wrap}
+.blk .x{margin-left:auto;background:rgba(0,0,0,.22);border:0;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1}
+.blk select{font:inherit;font-size:14px;border-radius:8px;border:0;padding:2px 6px;color:#23304A;background:#fff;max-width:100%}
+.c-move{background:#2F9BFF}.c-act{background:#FF9F1C}.c-loop{background:#22C55E}.c-cond{background:#8B5CF6}
+.blk .slot{margin:0 8px 0 18px;padding:4px 6px;min-height:36px;background:rgba(255,255,255,.28);border-radius:10px}
+.blk .slot:empty::before{content:'buraya bırak';color:rgba(0,0,0,.4);font-size:13px;display:block;padding:6px}
+.blk .mid{padding:4px 14px;font-size:14px}
+.blk .ft{height:10px}
+.slot.over{outline:3px dashed #FF2D78;background:rgba(255,255,255,.6)!important}
+.blk.run{outline:4px solid #FFE600;box-shadow:0 0 0 5px rgba(255,230,0,.5),0 4px 0 rgba(0,0,0,.22);z-index:2}
+.ghost{position:fixed;z-index:999;pointer-events:none;opacity:.92;width:240px;transform:rotate(-2deg)}
+body.dragging{cursor:grabbing}
+.stat{margin:8px 2px;font-size:16px}
+.legend{font-size:13px;color:#667;margin-bottom:8px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap}
+.hint{background:#EEF4FF;border-left:6px solid #8B5CF6;border-radius:10px;padding:10px 12px;margin-top:10px;line-height:1.4}
+.modal{position:fixed;inset:0;background:rgba(20,50,90,.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:14px;overflow:auto}
+.mbox{max-width:540px;width:100%;background:#fff;border-radius:28px;padding:22px;text-align:center;animation:pop .35s;max-height:95vh;overflow:auto}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.06)}100%{transform:scale(1)}}
+.stars span{font-size:52px;filter:grayscale(1);opacity:.3;display:inline-block}
+.stars span.on{filter:none;opacity:1;animation:pop .6s}
+.crit{list-style:none;padding:0;text-align:left;display:inline-block;margin:6px 0}
+.crit li{margin:4px 0}
+.tip{background:#FFF6DD;border-radius:12px;padding:8px 12px;font-size:15px}
+.fact{background:#E7F5FF;border-radius:14px;padding:10px 12px;text-align:left;margin:10px 0;font-size:15px;line-height:1.4}
+.mb{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:#23304A;color:#fff;padding:10px 20px;border-radius:30px;font-weight:600;z-index:1200;transition:transform .25s;pointer-events:none}
+#toast.on{transform:translateX(-50%) translateY(0)}
+.cf{position:fixed;top:-40px;z-index:1100;animation:fall 2.4s linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(112vh) rotate(360deg)}}
+.certbox{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.certbox input{padding:11px;border-radius:12px;border:3px solid #CFE3F3;font-family:inherit;font-size:16px;min-width:230px}
+.cta{background:#F2FBFF;border-radius:18px;padding:14px;margin:14px 0;line-height:1.7}
+.cert{display:none}
+@media print{
+  body>*:not(#cert){display:none!important}
+  .cert{display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:12px double #FF9F1C;border-radius:24px;margin:20px;padding:50px;min-height:90vh;background:#fff}
+  .cert .ct{font-size:44px;color:#FF7A00;font-weight:700}.cert .cn{font-size:54px;margin:26px 0;border-bottom:4px solid #FFC400;padding:0 30px}.cert p{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- BAŞLANGIÇ -->
+<div id="intro" class="screen">
+  <div class="sky"><span style="left:5%;top:10%">☁️</span><span style="left:80%;top:7%;animation-delay:-3s">☁️</span><span style="left:8%;top:72%">🌻</span><span style="left:88%;top:68%;animation-delay:-2s">🌼</span></div>
+  <div class="wrap center">
+    <a class="back" href="/">← odtumusprime.com</a>
+    <div class="hero card">
+      <div class="bigbee">🐝</div>
+      <h1>Bumblebee'nin Bahçesi</h1>
+      <p class="sub">Blok kodlamayla robot arı <b>Bumblebee</b>'yi yönet, polen ve nektar topla, <b>bal üret</b>!<br>40–60 dakikalık eğlenceli bir kodlama macerası 🚀</p>
+      <h3>Zorluk seç:</h3>
+      <div class="dgrid" id="dgrid"></div>
+      <button class="btn go big" id="start">▶ Başla</button>
+      <div class="ftc">
+        <b>🤖 FIRST® Tech Challenge (FTC) nedir?</b>
+        <p style="margin:6px 0">FTC, 7. sınıftan lise sonuna kadar öğrencilerin takım kurup <b>robot tasarladığı, kodladığı ve yarıştığı</b> uluslararası bir programdır. Bumblebee de ODTÜmus Prime (#25601) takımımızın yarışma robotunun adı!</p>
+        <div class="trio"><div>🔧 Robotu yap</div><div>💻 Robotu kodla</div><div>🤝 Birlikte öğren</div></div>
+        <a href="https://www.firstinspires.org/robotics/ftc" target="_blank" rel="noopener">FTC hakkında daha fazlası →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OYUN -->
+<div id="game" class="screen hidden">
+  <div class="wrap">
+    <div class="top card">
+      <a class="brand" href="#" id="home">🐝 <b>Bumblebee'nin Bahçesi</b></a>
+      <div class="dots" id="dots"></div>
+      <div class="tools"><select id="dsel"></select><span class="pill" id="tstars">⭐ 0</span><button class="mini" id="endbtn" title="Bitiş ekranı">🏆</button></div>
+    </div>
+    <div class="stage">
+      <div class="card">
+        <div class="lvhd"><div class="lvno" id="lvno">1</div><div><h2 id="lvtitle"></h2><div class="tag" id="lvtag"></div></div></div>
+        <p id="story"></p>
+        <div class="goal">🎯 <b id="goal"></b></div>
+        <div class="wx" id="wx"></div>
+        <div class="board" id="board"><div class="grid" id="grid"></div>
+          <div class="bee" id="bee"><div id="beeshake"><div class="arrow" id="beearrow"></div><div id="beebody">🐝</div></div></div></div>
+        <div class="erow">⚡ <div class="ebar"><i id="ebar"></i></div><b id="enum"></b></div>
+        <div class="inv" id="inv"></div>
+      </div>
+      <div class="card">
+        <div class="coder">
+          <div class="pal" id="pal"></div>
+          <div class="wsbox" id="wsbox"><div class="hat">🏁 Başlat</div><div id="prog" class="slot"></div></div>
+        </div>
+        <div class="stat">🧱 Blok: <b id="cnt">0</b> &nbsp;•&nbsp; ⭐ 2. yıldız için hedef: ≤ <b id="par"></b> blok</div>
+        <div class="legend" id="legend"></div>
+        <div class="ctrl">
+          <button class="btn go" id="run">▶ Çalıştır</button>
+          <button class="btn stop" id="reset">⏹ Başa al</button>
+          <button class="btn" id="spd">🐇 Hız</button>
+          <button class="btn alt" id="hintbtn">💡 İpucu</button>
+          <button class="btn pur hidden" id="solbtn">👀 Uzman çözümü</button>
+          <button class="btn" id="clear" style="background:#94A3B8;box-shadow:0 5px 0 #64748B">🗑 Temizle</button>
+        </div>
+        <div id="hintbox" class="hint hidden"></div>
+        <div id="viewnote" class="hint hidden">👀 Uzman çözümünü görüyorsun. Çalıştırıp kendi kodunla karşılaştır! (Bu kodla yıldız kazanılmaz.)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BİTİŞ -->
+<div id="end" class="screen hidden">
+  <div class="wrap center">
+    <div class="hero card">
+      <div class="bigbee">🏆</div>
+      <h1>Tebrikler, Kod Arıcısı!</h1>
+      <p class="sub" id="endtxt"></p>
+      <div id="endbadges" style="font-size:18px"></div>
+      <div class="certbox"><input id="cname" placeholder="Adını yaz (sertifika için)" maxlength="30"><button class="btn alt" id="print">🖨️ Sertifikayı yazdır</button></div>
+      <div class="cta">
+        🤖 Bumblebee gibi gerçek robotları tasarlayıp kodlamak ister misin?<br>
+        <a href="https://www.firstinspires.org/robotics/ftc" target="_blank" rel="noopener">FIRST® Tech Challenge'ı keşfet</a> •
+        <a href="/">ODTÜmus Prime #25601'i tanı</a> •
+        <a href="https://www.instagram.com/odtumusprime25601/" target="_blank" rel="noopener">Instagram</a> •
+        <a href="/iletisim">Bize ulaş</a><br>
+        <b>“We Build, We Learn, We Inspire.”</b>
+      </div>
+      <div class="mb"><button class="btn" id="back2">↩ Bölümlere dön</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="cert" id="cert"><div class="ct">🐝 Kod Arıcısı Sertifikası</div><div class="cn" id="certName"></div>
+  <p>Bumblebee'nin Bahçesi'nde 12 bölümü tamamladı ve <b id="certStars"></b> ⭐ topladı!</p>
+  <p>FIRST® Tech Challenge • ODTÜmus Prime #25601 • odtumusprime.com</p></div>
+<div class="modal hidden" id="modal"><div class="mbox" id="mbox"></div></div>
+<div id="toast"></div>
+<noscript>Bu oyun için JavaScript gerekir.</noscript>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const DIRS=[[0,-1],[1,0],[0,1],[-1,0]];
+const WIND={'^':0,'>':1,'v':2,'<':3}, WEM={'^':'⬆️','>':'➡️','v':'⬇️','<':'⬅️'};
+const DIFFS=['easy','normal','hard'];
+const DN={easy:'Kolay',normal:'Orta',hard:'Zor'}, DE={easy:'🌼',normal:'🐝',hard:'🔥'};
+const PARADD={easy:3,normal:1,hard:0};
+const DESC={easy:['~40 dakika','Bol enerji, ipuçları açık'],normal:['~50 dakika','Dengeli enerji, ipucu isteyince'],hard:['~60 dakika','Az enerji, kısa kod, ipucu 3 denemeden sonra']};
+const ALL=/[?&]all=1/.test(location.search), TEST=/[?&]test=1/.test(location.search);
+let UID=0;
+
+const BT={
+  fwd:{t:'İleri git',i:'⬆️',c:'move'}, left:{t:'Sola dön',i:'↩️',c:'move'}, right:{t:'Sağa dön',i:'↪️',c:'move'},
+  pollen:{t:'Polen topla',i:'🌼',c:'act'}, nectar:{t:'Nektar topla',i:'💧',c:'act'}, drop:{t:'Kovana bırak',i:'🏠',c:'act'},
+  repeat:{t:'',i:'🔁',c:'loop',box:1}, if:{t:'',i:'❓',c:'cond',box:1}, ifelse:{t:'',i:'❓',c:'cond',box:1}
+};
+const CATS=[['move','Hareket'],['act','Eylemler'],['loop','Döngüler'],['cond','Koşullar']];
+const COND={blocked:'önümde engel var',clear:'önüm açık',rainAhead:'önümde yağmur var',pollenHere:'burada polen çiçeği var',nectarHere:'burada nektar çiçeği var',atHive:'kovandayım',lowEnergy:'enerjim az (≤3)'};
+
+/* Harita: . çimen  # çalı  R yağmur  S kovan(başlangıç)  G hedef  p polen çiçeği  n nektar çiçeği  E enerji pili  ^ > v < rüzgâr */
+const LV=[
+{title:'Kovandan Çıkış',tag:'İleri hareket',w:'☀️ Güneşli bir gün',
+ story:`Günaydın! Bumblebee kovanından çıkıp güneş çiçeğine uçmak istiyor. Ona yolu sen tarif et!`,
+ goal:'Bumblebee 🌻 güneş çiçeğinde dursun.',
+ map:['#.....#','.......','...#...','.S..G..','.......','..#...#','.......'],dir:1,
+ blocks:['fwd'],conds:[],need:{reach:1},energy:[11,6,4],sol:'F F F',
+ hint:`Bumblebee sağa (doğuya) bakıyor. "İleri git" bloğunu sürükleyip "Başlat"ın altına bırak. Çiçeğe kaç kare var, say!`,
+ fact:`FIRST Tech Challenge (FTC), 7. sınıftan lise sonuna kadar öğrencilerin kendi robotlarını tasarlayıp kodladığı uluslararası bir robotik yarışmasıdır.`},
+{title:'Uzun Yol',tag:'Enerji ve piller',w:'☀️ Güneşli',
+ story:`Çiçek bu sefer uzakta! Yolda bir 🔋 pil görüyor musun? Üstünden geçince Bumblebee'nin gücü yenilenir.`,
+ goal:'Bumblebee 🌻 güneş çiçeğine ulaşsın. Enerjisi bitmesin!',
+ map:['.#...#.','...G...','.......','.#...#.','...E...','.......','...S...'],dir:0,
+ blocks:['fwd'],conds:[],need:{reach:1},energy:[8,3,2],sol:'F F F F F',
+ hint:`Her "ileri" 1 enerji harcar. Yol düz, 🔋 pilin üstünden geç ve enerji kazan!`,
+ fact:`FTC robotları 12 voltluk pillerle çalışır. Enerjiyi akıllı kullanan takımlar maçları kazanır!`},
+{title:'Dönüş Zamanı',tag:'Sağa ve sola dön',w:'☀️ Güneşli',
+ story:`Bumblebee köşeleri dönmeyi öğrenmeli. "Sola dön" ve "Sağa dön" komutları yönünü değiştirir.`,
+ goal:'Bumblebee 🌻 güneş çiçeğinde dursun.',
+ map:['.......','.#...#.','....G..','.#...#.','.......','S......','.......'],dir:1,
+ blocks:['fwd','left','right'],conds:[],need:{reach:1},energy:[15,10,8],
+ sol:'F F F F L F F F',
+ wx:{patch:[[2,5,'R']],msg:`Doğudaki yol kapandı! Başka bir yoldan git.`,sol:'L F F F R F F F F'},
+ hint:`Önce doğuya git, sonra "Sola dön" ve kuzeye (yukarı) ilerle. Kaç adım olduğunu say!`,
+ fact:`Robotlar da dönüşleri komutlarla yapar. Gerçek robotlarda tekerlek sensörleri robotun ne kadar döndüğünü ölçer.`},
+{title:'Çalılıklı Labirent',tag:'Labirent',w:'🌧️ Yağmurlu: bulutlu kareler kapalı',
+ story:`Yağmur bulutları ve çalılar yolu kapatmış! Bumblebee'yi labirentten çıkar.`,
+ goal:'Bumblebee 🌻 güneş çiçeğine ulaşsın.',
+ map:['S.##R..','#.R#G#R','#.#R.##','#....R#','..#.R..','.#...#.','...#R..'],dir:1,
+ blocks:['fwd','left','right'],conds:[],need:{reach:1},energy:[17,12,10],
+ sol:'F R F F F L F F F L F F',
+ hint:`Yolu parça parça çöz: ileri, sağa dön, 3 adım, sola dön... Bulutlu ve çalılı kareler geçilmez.`,
+ fact:`Bir mühendis önce yolu planlar, sonra kodu yazar. Önce kâğıtta planlamak çok zaman kazandırır!`},
+{title:'İlk Polen',tag:'Eylem komutları',w:'☀️ Güneşli',
+ story:`Çiçekler Bumblebee'nin yardımını bekliyor. Çiçeğin üstüne gel ve polen topla ki tozlaşsınlar!`,
+ goal:'En az 1 çiçekten polen topla. Bonus: iki çiçeği de tozlaştır!',
+ map:['.......','.S.p...','..#.#..','.......','...p...','.#...#.','.......'],dir:1,
+ blocks:['fwd','left','right','pollen'],conds:[],need:{pollen:1},energy:[15,10,8],
+ sol:'F F P R F F F P',
+ hint:`Önce çiçeğin üstüne uç, sonra "🌼 Polen topla" bloğunu kullan. Polen toplamak da 1 enerji harcar.`,
+ fact:`FTC robotları sahadaki oyun parçalarını toplar ve hedeflere bırakır; tıpkı senin polenlerin gibi!`},
+{title:'Çiçek Turu',tag:'Algoritma: sıralama',w:'☀️ Güneşli',
+ story:`Üç çiçeği sırayla ziyaret et. Komutların sırası çok önemli: buna <b>algoritma</b> denir!`,
+ goal:'3 çiçekten de polen topla.',
+ map:['.#...#.','.......','..p..p.','...#...','.......','S.p....','.#...#.'],dir:1,
+ blocks:['fwd','left','right','pollen'],conds:[],need:{pollen:3},energy:[19,14,12],
+ sol:'F F P L F F F P R F F F P',
+ hint:`Sırayla: 1. çiçeğe git ve topla, 2. çiçeğe git ve topla, 3. çiçeğe git ve topla. Dönüşleri unutma!`,
+ fact:`Sıra önemlidir! Bir robotun komutlarının sırası değişirse tamamen başka bir şey yapar. Buna algoritma denir.`},
+{title:'Merdiven Yolu',tag:'Döngüler',w:'☀️ Güneşli',
+ story:`Bu yolda aynı hareketler hep tekrar ediyor. Döngü bloğuyla az kodla çok iş yap!`,
+ goal:'Bumblebee 🌻 güneş çiçeğine ulaşsın. Çok az blok kullan!',
+ map:['S.##...','#..##..','.#..#..','..#..#.','.#.#G#.','.......','.#...#.'],dir:1,
+ blocks:['fwd','left','right','repeat'],conds:[],need:{reach:1},energy:[16,11,9],
+ sol:'x4[F R F L]',
+ hint:`Merdiven gibi: "ileri, sağa dön, ileri, sola dön" hep tekrar ediyor. Bu 4 bloğu bir 🔁 döngünün içine koy!`,
+ fact:`Döngüler kodu kısaltır ve hata riskini azaltır. Profesyonel yazılımcılar da sürekli döngü kullanır.`},
+{title:'Polen Turu',tag:'Döngü + eylem',w:'☀️ Güneşli',
+ story:`Dört köşeli bir bahçe turu! Köşelerdeki çiçeklerden polen topla. Döngü yine işine yarayacak.`,
+ goal:'3 çiçekten de polen topla.',
+ map:['.#...#.','.S.p...','..#....','.p.p...','.......','.#...#.','.......'],dir:1,
+ blocks:['fwd','left','right','pollen','repeat'],conds:[],need:{pollen:3},energy:[17,12,10],
+ sol:'x3[F F P R]',
+ wx:{patch:[[2,1,'R']],msg:`Yağmur ilk yolu kapattı! Turu ters yönde yapmalısın.`,sol:'R x3[F F P L]'},
+ hint:`Her köşede aynı şey oluyor: "ileri, ileri, polen, sağa dön". 3 kez tekrarla!`,
+ fact:`FTC maçlarının ilk 30 saniyesi otonomdur: robot kimse kumanda etmeden kendi kodunu çalıştırır!`},
+{title:'Hata Avcısı',tag:'Hata ayıklama (debug)',w:'🌧️ Yağmurlu: bulutlu kareler kapalı',
+ story:`Bumblebee için yazılmış kodda hata var ve Bumblebee kayboldu! Kodu çalıştır, nerede yanlış yaptığını bul ve düzelt. Baştan yazmana gerek yok!`,
+ goal:'Hatayı bul, düzelt ve Bumblebee 🌻 hedefe ulaşsın.',
+ map:['..#.#..','S..##..','.#.##G.','##.RR.#','.#.....','.#R.#..','.......'],dir:1,
+ blocks:['fwd','left','right','repeat'],conds:[],need:{reach:1},energy:[18,13,11],
+ preset:{easy:'F F L F F F L F F F L F F',normal:'F F R F F L F F F R F F',hard:'F F R F F L F F F R F F'},
+ sol:'F F R x3[F] L x3[F] L F F',
+ hint:`Kodu çalıştır ve parlayan bloğa dikkat et: Bumblebee nerede şaşırıyor? Yanlış yöne dönmüş veya bir adım eksik olabilir.`,
+ fact:`Hata bulmaya "debug" denir. FTC takımları robotlarını sürekli test edip hataları düzeltir ve her şeyi mühendislik defterine yazar.`},
+{title:'Doğru Çiçeği Seç',tag:'Koşullar (eğer ... ise)',w:'☀️ Güneşli',
+ story:`Bazı çiçeklerde polen 🌼, bazılarında nektar 🌺 var. Bumblebee her çiçeğe bakıp karar vermeli: eğer ... ise ...`,
+ goal:'3 polen ve 2 nektar topla (sırtında taşıyabilirsin).',
+ map:['.#...#.','.......','..#.#..','Spn.pnp','..#.#..','.......','.#...#.'],dir:1,
+ blocks:['fwd','left','right','pollen','nectar','repeat','if','ifelse'],conds:['pollenHere','nectarHere'],need:{pollen:3,nectar:2,mode:'collect'},energy:[19,14,12],
+ sol:'x6[F ?pollenHere[P] ?nectarHere[N]]',
+ hint:`Her adımdan sonra sor: "burada polen çiçeği var mı?" varsa polen topla. "Burada nektar çiçeği var mı?" varsa nektar topla. Hepsini bir 🔁 döngüye koy.`,
+ fact:`Robotlar sensörlerle çevresini algılar ve "eğer ... ise" kararları verir. Kodlamada buna koşul denir.`},
+{title:'Nektarı Taşı',tag:'Çok aşamalı görev',w:'☀️ Güneşli',
+ story:`İki nektar çiçeğinden nektar topla ve kovana getir! Dönüş yolunda bir 🔋 pil var.`,
+ goal:'2 nektarı kovana bırak (🏠 üstünde "Kovana bırak").',
+ map:['.#...#.','.......','.n..n..','...#...','....E..','.S.....','.#...#.'],dir:0,
+ blocks:['fwd','left','right','nectar','drop','repeat'],conds:[],need:{nectar:2,mode:'deliver'},energy:[18,13,11],
+ sol:'x2[x3[F] N R] x2[x3[F] R] D',
+ hint:`Üç aşama: 1) nektarları topla, 2) kovana dön, 3) "Kovana bırak". Döngünün içinde döngü bile kullanabilirsin!`,
+ fact:`Çok aşamalı görevler FTC'de çok yaygındır: topla, taşı, bırak. Planı parçalara bölmek her şeyi kolaylaştırır.`},
+{title:'Bal Zamanı!',tag:'Serbest problem çözme',w:'🌧️💨 Yağmurlu ve rüzgârlı: oklu kareler seni iter',
+ story:`Büyük final! Bahçeyi kurtarmak için 3 polen ve 2 nektar topla, kovana getir ve <b>bal üret</b>. Yağmura ve rüzgâra dikkat!`,
+ goal:'3 polen topla, 2 nektarı kovana bırak ve 🍯 bal üret!',
+ map:['#R#R#R#','#R#p.n#','R##.R.#','#E.S<pR','R.R.###','#n.p#R#','#R#R#R#'],dir:0,
+ blocks:['fwd','left','right','pollen','nectar','drop','repeat','if','ifelse'],conds:['pollenHere','nectarHere','atHive','blocked','clear'],
+ need:{pollen:3,nectar:2,honey:1,mode:'deliver'},energy:[26,21,19],
+ sol:'x3[F F ?pollenHere[P] ?nectarHere[N] R] F D L x3[F F ?pollenHere[P] ?nectarHere[N] R] F F D',
+ hint:`Rüzgâr 💨 seni fazladan iter: oka giren kare seni bir kare daha götürür. İki bahçe turu birbirine benziyor, kodunu tekrar kullan!`,
+ fact:`FIRST'te takımlar rakipleriyle bile yardımlaşır: buna Coopertition® denir. Bu yüzden FTC sadece robot değil, dostluk yarışmasıdır!`}
+];
+LV.forEach(L=>{ L.tot={p:0,n:0,E:0}; L.map.forEach(r=>{ if(r.length!==7) console.warn('Harita satırı 7 karakter değil:',r); [...r].forEach(c=>{ if(c==='p')L.tot.p++; if(c==='n')L.tot.n++; if(c==='E')L.tot.E++; }); }); });
+
+/* ---------- Durum ---------- */
+let SAVE=null; try{SAVE=JSON.parse(localStorage.getItem('bb_v1'));}catch(e){}
+SAVE=SAVE||{}; SAVE.stars=SAVE.stars||{easy:[],normal:[],hard:[]}; SAVE.badges=SAVE.badges||{}; SAVE.diff=SAVE.diff||'normal';
+DIFFS.forEach(d=>{SAVE.stars[d]=SAVE.stars[d]||[];});
+function persist(){try{localStorage.setItem('bb_v1',JSON.stringify(SAVE));}catch(e){}}
+const G={diff:SAVE.diff,li:0,S:null,prog:[],progs:{},running:false,tok:0,fails:0,wx:false,viewing:false,speed:450,hintOn:false};
+const curL=()=>LV[G.li];
+const di=()=>DIFFS.indexOf(G.diff);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const inB=(x,y)=>x>=0&&y>=0&&x<7&&y<7;
+const blockedAt=(x,y)=>!inB(x,y)||G.S.cells[y][x]==='#'||G.S.cells[y][x]==='R';
+
+/* ---------- Blok modeli ---------- */
+function mk(t,p){
+  const b={t:t,id:++UID};
+  if(t==='repeat'){b.n=3;b.body=[];}
+  if(t==='if'||t==='ifelse'){b.c=(curL().conds[0])||'blocked';b.body=[];if(t==='ifelse')b.else=[];}
+  return Object.assign(b,p||{});
+}
+function parse(src){
+  const tk=src.replace(/([\[\]|])/g,' $1 ').trim().split(/\s+/); let i=0;
+  const T={F:'fwd',L:'left',R:'right',P:'pollen',N:'nectar',D:'drop'};
+  function seq(){
+    const a=[];
+    while(i<tk.length&&tk[i]!==']'&&tk[i]!=='|'){
+      const w=tk[i++];
+      if(T[w]) a.push(mk(T[w]));
+      else if(w[0]==='x'){ i++; const body=seq(); i++; a.push(mk('repeat',{n:+w.slice(1),body:body})); }
+      else if(w[0]==='?'){ i++; const body=seq(); let els=null; if(tk[i]==='|'){i++;els=seq();} i++;
+        a.push(els?mk('ifelse',{c:w.slice(1),body:body,else:els}):mk('if',{c:w.slice(1),body:body})); }
+    }
+    return a;
+  }
+  return seq();
+}
+function cnt(a){let n=0;for(const b of a){n++;if(b.body)n+=cnt(b.body);if(b.else)n+=cnt(b.else);}return n;}
+LV.forEach(L=>{L.par=cnt(parse(L.sol));});
+
+/* ---------- Benzetim ---------- */
+function newSim(){
+  const L=curL(), cells=L.map.map(r=>r.split(''));
+  if(G.wx&&L.wx) L.wx.patch.forEach(p=>{cells[p[1]][p[0]]=p[2];});
+  let sx=0,sy=0; cells.forEach((r,y)=>r.forEach((c,x)=>{if(c==='S'){sx=x;sy=y;}}));
+  return {cells:cells,x:sx,y:sy,dir:L.dir,rot:L.dir*90,energy:L.energy[di()],pollen:0,carry:0,delivered:0,honey:0,done:new Set(),bumps:0,over:false};
+}
+function resetSim(){
+  G.S=newSim();
+  document.querySelectorAll('.blk.run').forEach(e=>e.classList.remove('run'));
+  drawBoard();drawBee();drawEnergy();drawInv();
+}
+function drawBoard(){
+  const S=G.S; let h='';
+  for(let y=0;y<7;y++)for(let x=0;x<7;x++){
+    const c=S.cells[y][x]; let cls='cell '+((x+y)%2?'b':'a'), ch='';
+    if(c==='#')ch='🌳'; else if(c==='R'){cls+=' t-rain';ch='🌧️';}
+    else if(c==='S'){cls+=' t-hive';ch='🏠';}
+    else if(c==='G'){cls+=' t-goal';ch='🌻';}
+    else if(c==='p')ch='🌼'; else if(c==='n')ch='🌺'; else if(c==='E')ch='🔋';
+    else if(WIND[c]!==undefined){cls+=' t-wind';ch=WEM[c];}
+    else if(S.done.has(x+','+y))ch='🌱';
+    h+='<div class="'+cls+'">'+ch+'</div>';
+  }
+  $('#grid').innerHTML=h;
+}
+function drawBee(bump){
+  const S=G.S;
+  $('#bee').style.transform='translate('+S.x*100+'%,'+S.y*100+'%)';
+  $('#beearrow').style.transform='rotate('+S.rot+'deg)';
+  $('#beebody').style.transform=S.dir===1?'scaleX(-1)':'';
+  if(bump){const e=$('#beeshake');e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump');}
+}
+function drawEnergy(){
+  const L=curL(),S=G.S,cap=L.energy[di()]+4*L.tot.E,p=Math.max(0,Math.min(100,S.energy/cap*100));
+  const b=$('#ebar'); b.style.width=p+'%'; b.style.background=p>50?'#22C55E':(p>25?'#FF9F1C':'#FF4D6D');
+  $('#enum').textContent=S.energy;
+}
+function card(ic,name,desc,v,t,extra){
+  return '<div class="ic2" title="'+desc+'"><b>'+ic+' '+name+'</b><div class="n">'+v+' / '+t+'</div><small>'+desc+(extra?'<br><b>'+extra+'</b>':'')+'</small></div>';
+}
+function drawInv(){
+  const S=G.S,L=curL(),T=L.tot,n=L.need; let h='';
+  if(T.p||n.pollen) h+=card('🌼','Polen','Çiçeklerin tozlaşmasına yardımcı olur.',S.pollen,T.p||n.pollen);
+  if(T.n||n.nectar){const dl=n.mode==='deliver';h+=card('💧','Nektar','Kovana taşınır ve bal üretiminde kullanılır.',dl?S.delivered:S.delivered+S.carry,T.n||n.nectar,dl?'Sırtında: '+S.carry:'');}
+  if(n.honey) h+=card('🍯','Bal','Gerekli kaynaklar kovana getirildiğinde üretilir.',S.honey,1);
+  $('#inv').innerHTML=h;
+}
+function test(c){
+  const S=G.S,d=DIRS[S.dir],nx=S.x+d[0],ny=S.y+d[1],here=S.cells[S.y][S.x];
+  switch(c){
+    case 'blocked':return blockedAt(nx,ny);
+    case 'clear':return !blockedAt(nx,ny);
+    case 'rainAhead':return inB(nx,ny)&&S.cells[ny][nx]==='R';
+    case 'pollenHere':return here==='p';
+    case 'nectarHere':return here==='n';
+    case 'atHive':return here==='S';
+    case 'lowEnergy':return S.energy<=3;
+  }
+  return false;
+}
+function* walk(arr){
+  for(const b of arr){
+    if(b.t==='repeat'){yield {hl:b.id};for(let i=0;i<b.n;i++)yield* walk(b.body);}
+    else if(b.t==='if'){yield {hl:b.id};if(test(b.c))yield* walk(b.body);}
+    else if(b.t==='ifelse'){yield {hl:b.id};yield* walk(test(b.c)?b.body:b.else);}
+    else yield {b:b};
+  }
+}
+function act(t){
+  const S=G.S,L=curL(),out={toast:'',bump:false,fail:''};
+  const cost=(t==='fwd'||t==='pollen'||t==='nectar')?1:0;
+  if(S.energy<cost){S.over=true;out.fail='Enerjin bitti! 🔋 Bumblebee uyuyakaldı. Daha kısa bir yol veya 🔋 pil dene.';return out;}
+  if(t==='left'){S.dir=(S.dir+3)%4;S.rot-=90;return out;}
+  if(t==='right'){S.dir=(S.dir+1)%4;S.rot+=90;return out;}
+  if(t==='fwd'){
+    S.energy--;
+    const d=DIRS[S.dir],nx=S.x+d[0],ny=S.y+d[1];
+    if(blockedAt(nx,ny)){S.bumps++;out.bump=true;out.toast='Engele çarptın! 💥';return out;}
+    S.x=nx;S.y=ny;
+    const w=WIND[S.cells[ny][nx]];
+    if(w!==undefined){const px=S.x+DIRS[w][0],py=S.y+DIRS[w][1];if(!blockedAt(px,py)){S.x=px;S.y=py;out.toast='Rüzgâr seni itti! 💨';}}
+    if(S.cells[S.y][S.x]==='E'){S.energy+=4;S.cells[S.y][S.x]='.';out.toast=(out.toast?out.toast+' ':'')+'⚡ +4 enerji!';}
+    return out;
+  }
+  const here=S.cells[S.y][S.x];
+  if(t==='pollen'){S.energy--;if(here==='p'){S.pollen++;S.cells[S.y][S.x]='.';S.done.add(S.x+','+S.y);out.toast='+1 polen 🌼';}else out.toast='Burada polen çiçeği yok 🤔';return out;}
+  if(t==='nectar'){S.energy--;if(here==='n'){S.carry++;S.cells[S.y][S.x]='.';S.done.add(S.x+','+S.y);out.toast='+1 nektar 💧';}else out.toast='Burada nektar çiçeği yok 🤔';return out;}
+  if(t==='drop'){
+    if(here!=='S'){out.toast='Burada kovan yok! 🏠';return out;}
+    if(!S.carry){out.toast='Taşıyacak nektarın yok 🤔';return out;}
+    S.delivered+=S.carry;S.carry=0;out.toast='Nektar kovana bırakıldı! 🏠';
+    const n=L.need;
+    if(n.honey&&!S.honey&&S.delivered>=n.nectar&&S.pollen>=n.pollen){S.honey=1;out.toast='🍯 BAL ÜRETİLDİ!';}
+    return out;
+  }
+  return out;
+}
+function evalWin(){
+  const S=G.S,n=curL().need,miss=[];
+  if(n.reach&&S.cells[S.y][S.x]!=='G')miss.push('Program bittiğinde Bumblebee 🌻 hedefte durmalı.');
+  if(n.pollen&&S.pollen<n.pollen)miss.push('Polen: '+S.pollen+'/'+n.pollen);
+  if(n.nectar){
+    if(n.mode==='deliver'){if(S.delivered<n.nectar)miss.push('Kovandaki nektar: '+S.delivered+'/'+n.nectar+' (nektarı kovana bırakmayı unutma!)');}
+    else if(S.carry+S.delivered<n.nectar)miss.push('Nektar: '+(S.carry+S.delivered)+'/'+n.nectar);
+  }
+  if(n.honey&&!S.honey)miss.push('Bal henüz üretilmedi: gerekli polen ve nektarı kovana getir.');
+  return miss;
+}
+function starFlags(){
+  const L=curL(),S=G.S,par=L.par+PARADD[G.diff],used=cnt(G.prog);
+  const hasItems=(L.tot.p+L.tot.n+L.tot.E)>0;
+  const left=S.cells.reduce((a,r)=>a+r.filter(c=>c==='p'||c==='n'||c==='E').length,0);
+  return {par:par,used:used,hasItems:hasItems,s2:used<=par,s3:hasItems?left===0:S.bumps===0};
+}
+
+/* ---------- Çalıştırma ---------- */
+function hl(id){
+  document.querySelectorAll('.blk.run').forEach(e=>e.classList.remove('run'));
+  if(id){const e=document.querySelector('.blk[data-id="'+id+'"]:not(.tpl)');if(e)e.classList.add('run');}
+}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1700);}
+function setBtns(){$('#run').disabled=G.running;}
+async function runProg(){
+  if(G.running)return;
+  if(!G.prog.length){toast('Önce bazı bloklar ekle! 🧩');return;}
+  closeModal();resetSim();G.running=true;setBtns();
+  const tok=++G.tok,it=walk(G.prog);let guard=0,failMsg='';
+  await sleep(250);
+  while(tok===G.tok){
+    const r=it.next();if(r.done)break;
+    const v=r.value;
+    if(v.hl){hl(v.hl);continue;}
+    if(++guard>500){failMsg='Bumblebee çok uzun süre uçtu! 🔄 Sonsuz bir döngü olabilir mi?';break;}
+    hl(v.b.id);
+    const out=act(v.b.t);
+    drawBoard();drawBee(out.bump);drawEnergy();drawInv();
+    if(out.toast)toast(out.toast);
+    if(out.fail){failMsg=out.fail;break;}
+    await sleep(G.speed);
+  }
+  if(tok!==G.tok)return;
+  G.running=false;setBtns();hl(0);
+  finish(failMsg);
+}
+function stopRun(){G.tok++;G.running=false;setBtns();resetSim();}
+function finish(failMsg){
+  if(failMsg)return failModal(failMsg);
+  const miss=evalWin();
+  if(miss.length)return failModal('Görev tamamlanamadı: '+miss.join(' • '));
+  successModal();
+}
+
+/* ---------- Modal ---------- */
+function openModal(h){$('#mbox').innerHTML=h;$('#modal').classList.remove('hidden');}
+function closeModal(){$('#modal').classList.add('hidden');}
+function confetti(){for(let i=0;i<36;i++){const s=document.createElement('span');s.className='cf';s.textContent=['🎉','🌼','⭐','🐝','🍯'][i%5];s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.6+'s';s.style.fontSize=(18+Math.random()*22)+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),3300);}}
+function failModal(msg){
+  G.fails++;updateHintBtn();
+  openModal('<h2>Olmadı 😅</h2><p>'+msg+'</p><p class="tip">Sorun değil! Mühendisler de böyle öğrenir: dene → hatayı bul → düzelt. Parlayan blok, Bumblebee\'nin son yaptığı komuttu.</p><div class="mb"><button class="btn go" data-a="again">🔁 Tekrar dene</button></div>');
+}
+function successModal(){
+  const L=curL(),S=G.S,f=starFlags(),star=on=>'<span class="'+(on?'on':'')+'">⭐</span>';
+  const hasLoop=L.blocks.indexOf('repeat')>-1;
+  if(G.viewing){
+    openModal('<h2>Uzman çözümü çalıştı! 🧠</h2><p>Bu çözümde <b>'+f.used+' blok</b> var. Senin kodunla karşılaştır: hangisi daha kısa? Yıldız kazanmak için kendi kodunu yaz!</p><div class="mb"><button class="btn pur" data-a="back">↩ Kodum</button></div>');
+    return;
+  }
+  if(G.wx){
+    SAVE.badges[G.li]=1;persist();confetti();renderHeader();
+    openModal('<h2>🌦️ Hava Ustası!</h2><p>Yağmur yolunu kapattı ama sen kodunu yeni duruma uyarladın. Mühendisler de planlarını değişen koşullara göre günceller!</p><div class="fact">🤖 <b>Rozet kazandın:</b> Hava Ustası 🌦️</div><div class="mb"><button class="btn" data-a="normal">↩ Normal harita</button>'+(G.li<11?'<button class="btn go" data-a="next">Sonraki bölüm ▶</button>':'')+'</div>');
+    return;
+  }
+  const key=G.diff,prev=SAVE.stars[key][G.li]|0;
+  SAVE.stars[key][G.li]=prev|1|(f.s2?2:0)|(f.s3?4:0);persist();renderHeader();confetti();
+  let h='<h2>'+(f.s2&&f.s3?'Mükemmel! 🎉':'Harika! 🎉')+'</h2><div class="stars">'+star(1)+star(f.s2)+star(f.s3)+'</div>'+
+    '<ul class="crit"><li>✅ Görev tamamlandı</li><li>'+(f.s2?'✅':'⬜')+' Blok sayısı: <b>'+f.used+'</b> (hedef ≤ '+f.par+')</li><li>'+(f.s3?'✅':'⬜')+' '+(f.hasItems?'Bütün çiçekleri ve pilleri topla':'Engele hiç çarpma')+'</li></ul>';
+  if(!f.s2)h+='<p class="tip">💡 Daha az blokla çözebilir misin? '+(hasLoop?'Döngüler yardımcı olabilir. ':'Yolu tekrar düşün. ')+'Uzman çözümüne bakıp karşılaştırabilirsin!</p>';
+  h+='<p>🔋 Kalan enerji: <b>'+S.energy+'</b> &nbsp;•&nbsp; Uzman çözümü: <b>'+L.par+'</b> blok</p><div class="fact">🤖 <b>Robot bilgisi:</b> '+L.fact+'</div><div class="mb"><button class="btn" data-a="again">🔁 Tekrar dene</button><button class="btn pur" data-a="sol">👀 Uzman çözümü</button>';
+  if(L.wx)h+='<button class="btn alt" data-a="wx">⛈️ Hava değişti!</button>';
+  h+='<button class="btn go" data-a="next">'+(G.li<11?'Sonraki bölüm ▶':'🏆 Bitir')+'</button></div>';
+  openModal(h);
+}
+
+/* ---------- Arayüz ---------- */
+function firstOpen(){for(let i=0;i<12;i++)if(!(SAVE.stars[G.diff][i]|0))return i;return 11;}
+function unlocked(i){return ALL||i===0||(SAVE.stars[G.diff][i-1]|0)>0;}
+function starsOf(d,i){const m=SAVE.stars[d][i]|0;return (m&1?1:0)+(m&2?1:0)+(m&4?1:0);}
+function totalStars(d){let t=0;for(let i=0;i<12;i++)t+=starsOf(d||G.diff,i);return t;}
+function renderHeader(){
+  $('#dots').innerHTML=LV.map((L,i)=>'<button class="dot'+(i===G.li?' cur':'')+(unlocked(i)?'':' lock')+'" data-i="'+i+'" title="'+L.title+'">'+(unlocked(i)?(i+1):'🔒')+'<small>'+'★'.repeat(starsOf(G.diff,i))+(SAVE.badges[i]?'☂':'')+'</small></button>').join('');
+  $('#tstars').textContent='⭐ '+totalStars()+' / 36';
+  $('#dsel').value=G.diff;
+}
+function updateHintBtn(){
+  const locked=G.diff==='hard'&&G.fails<3;
+  const b=$('#hintbtn');b.disabled=locked;b.textContent=locked?'💡 İpucu 🔒':'💡 İpucu';
+  b.title=locked?'Zor modda 3 denemeden sonra açılır':'';
+}
+function showHint(on){G.hintOn=on;const b=$('#hintbox');b.classList.toggle('hidden',!on);if(on)b.innerHTML='💡 <b>İpucu:</b> '+curL().hint;}
+function renderInfo(){
+  const L=curL();
+  $('#lvno').textContent=G.li+1;$('#lvtitle').textContent=L.title;$('#lvtag').textContent='Yeni: '+L.tag;
+  $('#story').innerHTML=L.story;$('#goal').textContent=L.goal;
+  $('#wx').innerHTML=G.wx?('⛈️ <b>Hava değişti!</b> '+L.wx.msg+' <button class="mini" id="wxback">Normal haritaya dön</button>'):L.w+(L.map.join('').match(/[\^>v<]/)?' &nbsp;(💨 oklu kareye girersen rüzgâr seni bir kare daha iter)':'');
+  const hasItems=(L.tot.p+L.tot.n+L.tot.E)>0;
+  $('#legend').innerHTML='⭐ görevi bitir &nbsp; ⭐ az blokla bitir &nbsp; ⭐ '+(hasItems?'bütün çiçekleri ve pilleri topla':'engele hiç çarpma')+'<br>⚡ ileri / topla: 1 enerji • dönmek bedava';
+  updateHintBtn();showHint(G.diff==='easy');
+  const solved=(SAVE.stars[G.diff][G.li]|0)>0||ALL;
+  $('#solbtn').classList.toggle('hidden',!solved);
+  $('#solbtn').textContent=G.viewing?'↩ Kodum':'👀 Uzman çözümü';
+  $('#viewnote').classList.toggle('hidden',!G.viewing);
+}
+function loadLevel(i,wx){
+  if(!unlocked(i))return;
+  G.li=i;G.wx=!!wx;G.fails=0;G.viewing=false;G.tok++;G.running=false;setBtns();closeModal();
+  const L=curL(),key=i+':'+G.diff;
+  if(!G.progs[key])G.progs[key]=L.preset?parse(L.preset[G.diff]||L.preset.normal):[];
+  G.prog=G.progs[key];
+  buildPalette();resetSim();renderWS();renderHeader();renderInfo();fit();
+}
+function renderWS(){
+  const root=$('#prog');root.innerHTML='';root._arr=G.prog;
+  G.prog.forEach(b=>root.appendChild(blockEl(b,G.prog)));
+  $('#cnt').textContent=cnt(G.prog);$('#par').textContent=curL().par+PARADD[G.diff];
+}
+function blockEl(b,arr,ghost){
+  const T=BT[b.t],d=document.createElement('div');
+  d.className='blk c-'+T.c;d.dataset.id=b.id;
+  const hd=document.createElement('div');hd.className='hd';
+  let h='<span>'+T.i+'</span>';
+  if(b.t==='repeat')h+='<select class="sn">'+[2,3,4,5,6,7,8,9].map(n=>'<option'+(n===b.n?' selected':'')+'>'+n+'</option>').join('')+'</select> kez tekrarla';
+  else if(b.t==='if'||b.t==='ifelse')h+='Eğer <select class="sc">'+curL().conds.map(c=>'<option value="'+c+'"'+(c===b.c?' selected':'')+'>'+COND[c]+'</option>').join('')+'</select> ise';
+  else h+=T.t;
+  if(!ghost&&arr)h+='<button class="x" title="Sil">✕</button>';
+  hd.innerHTML=h;d.appendChild(hd);
+  if(T.box){
+    const s=document.createElement('div');s.className='slot';s._arr=b.body;
+    b.body.forEach(c=>s.appendChild(blockEl(c,b.body,ghost)));d.appendChild(s);
+    if(b.t==='ifelse'){
+      const m=document.createElement('div');m.className='mid';m.textContent='değilse';d.appendChild(m);
+      const s2=document.createElement('div');s2.className='slot';s2._arr=b.else;
+      b.else.forEach(c=>s2.appendChild(blockEl(c,b.else,ghost)));d.appendChild(s2);
+    }
+    const f=document.createElement('div');f.className='ft';d.appendChild(f);
+  }
+  if(ghost){d.querySelectorAll('select').forEach(s=>{s.disabled=true;});}
+  else if(arr){
+    const sn=hd.querySelector('.sn');if(sn)sn.onchange=()=>{b.n=+sn.value;renderWS();};
+    const sc=hd.querySelector('.sc');if(sc)sc.onchange=()=>{b.c=sc.value;};
+    const x=hd.querySelector('.x');
+    if(x)x.onclick=e=>{e.stopPropagation();if(G.running)return;const i=arr.indexOf(b);if(i>-1)arr.splice(i,1);renderWS();};
+    d.addEventListener('pointerdown',e=>blockDown(e,b,arr,d));
+  }
+  return d;
+}
+function buildPalette(){
+  const L=curL(),root=$('#pal');root.innerHTML='';
+  CATS.forEach(c=>{
+    const ts=Object.keys(BT).filter(t=>BT[t].c===c[0]&&L.blocks.indexOf(t)>-1);if(!ts.length)return;
+    const g=document.createElement('div');g.innerHTML='<div class="pcat c-'+c[0]+'">'+c[1]+'</div>';
+    ts.forEach(t=>{const e=blockEl(mk(t),null,true);e.classList.add('tpl');e.addEventListener('pointerdown',ev=>palDown(ev,t));g.appendChild(e);});
+    root.appendChild(g);
+  });
+}
+
+/* ---------- Sürükle-bırak ---------- */
+let ghost=null,hover=null;
+function listen(mv,up){
+  const off=()=>{window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',fin);window.removeEventListener('pointercancel',fin);};
+  const fin=ev=>{off();up(ev);};
+  window.addEventListener('pointermove',mv);window.addEventListener('pointerup',fin);window.addEventListener('pointercancel',fin);
+}
+function beginGhost(b){ghost=document.createElement('div');ghost.className='ghost';ghost.appendChild(blockEl(b,null,true));document.body.appendChild(ghost);document.body.classList.add('dragging');}
+function slotAt(x,y){const els=document.elementsFromPoint(x,y);for(let i=0;i<els.length;i++){const el=els[i];if(el.classList&&el.classList.contains('slot')&&el._arr)return el;}return null;}
+function moveGhost(ev){
+  ghost.style.left=(ev.clientX-30)+'px';ghost.style.top=(ev.clientY-18)+'px';
+  const s=slotAt(ev.clientX,ev.clientY);
+  if(hover&&hover!==s)hover.classList.remove('over');
+  hover=s;if(s)s.classList.add('over');
+}
+function endGhost(ev,b){
+  ghost.remove();ghost=null;document.body.classList.remove('dragging');
+  if(hover){hover.classList.remove('over');hover=null;}
+  const s=slotAt(ev.clientX,ev.clientY);
+  if(s){
+    const kids=[].filter.call(s.children,c=>c.classList.contains('blk'));
+    let idx=kids.length;
+    for(let i=0;i<kids.length;i++){const r=kids[i].getBoundingClientRect();if(ev.clientY<r.top+r.height/2){idx=i;break;}}
+    s._arr.splice(idx,0,b);
+  }else{
+    const r=$('#wsbox').getBoundingClientRect();
+    if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom)G.prog.push(b);
+  }
+  renderWS();
+}
+function palDown(e,t){
+  if(G.running)return;e.preventDefault();
+  const sx=e.clientX,sy=e.clientY;let moved=false,nb=null;
+  listen(ev=>{
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>6){moved=true;nb=mk(t);beginGhost(nb);}
+    if(moved)moveGhost(ev);
+  },ev=>{if(moved)endGhost(ev,nb);else{G.prog.push(mk(t));renderWS();}});
+}
+function blockDown(e,b,arr,d){
+  if(G.running)return;
+  if(e.target.closest('select,.x'))return;
+  const s=e.target.closest('.slot');
+  if(s&&s!==d&&d.contains(s))return;
+  e.stopPropagation();e.preventDefault();
+  const sx=e.clientX,sy=e.clientY;let moved=false;
+  listen(ev=>{
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>6){
+      moved=true;const i=arr.indexOf(b);if(i>-1)arr.splice(i,1);renderWS();beginGhost(b);
+    }
+    if(moved)moveGhost(ev);
+  },ev=>{if(moved)endGhost(ev,b);});
+}
+
+/* ---------- Düğmeler ---------- */
+function toggleSol(){
+  const L=curL(),key=G.li+':'+G.diff;
+  stopRun();
+  if(!G.viewing){G.viewing=true;G.prog=parse(G.wx&&L.wx?L.wx.sol:L.sol);}
+  else{G.viewing=false;G.prog=G.progs[key];}
+  renderWS();renderInfo();
+}
+function resetCode(){
+  const L=curL(),key=G.li+':'+G.diff;
+  stopRun();G.viewing=false;
+  G.progs[key]=L.preset?parse(L.preset[G.diff]||L.preset.normal):[];
+  G.prog=G.progs[key];renderWS();renderInfo();
+}
+function nextLevel(){if(G.li<11)loadLevel(G.li+1);else showEnd();}
+$('#mbox').addEventListener('click',e=>{
+  const a=e.target.closest('[data-a]');if(!a)return;
+  const k=a.dataset.a;closeModal();
+  if(k==='sol')toggleSol();
+  else if(k==='back')toggleSol();
+  else if(k==='wx')loadLevel(G.li,true);
+  else if(k==='normal')loadLevel(G.li,false);
+  else if(k==='next')nextLevel();
+});
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+$('#run').onclick=runProg;
+$('#reset').onclick=stopRun;
+$('#clear').onclick=()=>{if(confirm('Bütün bloklar silinsin mi?'))resetCode();};
+$('#solbtn').onclick=toggleSol;
+$('#hintbtn').onclick=()=>showHint(!G.hintOn);
+$('#spd').onclick=()=>{const s=[[800,'🐢 Yavaş'],[450,'🐇 Normal'],[170,'⚡ Hızlı']];let i=s.findIndex(x=>x[0]===G.speed);i=(i+1)%3;G.speed=s[i][0];$('#spd').textContent=s[i][1];};
+$('#spd').textContent='🐇 Normal';
+$('#dots').addEventListener('click',e=>{const b=e.target.closest('.dot');if(!b||b.classList.contains('lock'))return;loadLevel(+b.dataset.i);});
+$('#wx').addEventListener('click',e=>{if(e.target.id==='wxback')loadLevel(G.li,false);});
+$('#home').onclick=e=>{e.preventDefault();stopRun();buildIntro();show('intro');};
+$('#endbtn').onclick=showEnd;
+
+/* ---------- Ekranlar ---------- */
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.toggle('hidden',s.id!==id);});
+  window.scrollTo(0,0);
+  if(id==='game')setTimeout(fit,50);
+}
+function fit(){
+  const b=$('#board');if(!b)return;
+  const w=b.clientWidth;if(w)b.style.setProperty('--cell',(w/7)+'px');
+}
+window.addEventListener('resize',fit);
+
+function setDiff(d){G.diff=d;SAVE.diff=d;persist();}
+function buildIntro(){
+  $('#dgrid').innerHTML=DIFFS.map(function(d){
+    return '<button class="dcard'+(d===G.diff?' sel':'')+'" data-d="'+d+'"><span class="de">'+DE[d]+'</span><b>'+DN[d]+'</b>'+
+      '<small>'+DESC[d][0]+'</small><small>'+DESC[d][1]+'</small><small>⭐ '+totalStars(d)+' / 36</small></button>';
+  }).join('');
+}
+$('#dgrid').addEventListener('click',function(e){
+  const c=e.target.closest('.dcard');if(!c)return;
+  setDiff(c.dataset.d);buildIntro();
+});
+$('#start').onclick=function(){show('game');loadLevel(firstOpen());};
+
+$('#dsel').innerHTML=DIFFS.map(function(d){return '<option value="'+d+'">'+DE[d]+' '+DN[d]+'</option>';}).join('');
+$('#dsel').onchange=function(e){
+  stopRun();setDiff(e.target.value);
+  loadLevel(unlocked(G.li)?G.li:firstOpen());
+};
+
+function showEnd(){
+  stopRun();
+  const t=totalStars();
+  let done=0;for(let i=0;i<12;i++)if(starsOf(G.diff,i)>0)done++;
+  $('#endtxt').innerHTML='<b>'+DN[G.diff]+'</b> seviyede <b>'+done+' / 12</b> bölümü tamamladın ve <b>'+t+' / 36 ⭐</b> topladın!'+
+    (done<12?'<br>Kalan bölümleri de bitirmeyi unutma! 🐝':'<br>Bahçe kurtuldu, kovan bal dolu! 🍯');
+  const bd=Object.keys(SAVE.badges).length;
+  $('#endbadges').innerHTML=bd?'🌦️ Hava Ustası rozeti: <b>'+bd+'</b> bölüm':'';
+  show('end');
+  if(done===12)confetti();
+}
+$('#back2').onclick=function(){buildIntro();show('intro');};
+$('#print').onclick=function(){
+  const n=($('#cname').value||'').trim()||'Genç Kod Arıcısı';
+  $('#certName').textContent=n;$('#certStars').textContent=totalStars();
+  window.print();
+};
+
+/* ---------- Otomatik doğrulama (?test=1) ---------- */
+function runSync(prog){
+  G.S=newSim();
+  let fail='',steps=0;
+  for(const v of walk(prog)){
+    if(v.hl)continue;
+    if(++steps>500){fail='sonsuz döngü';break;}
+    const r=act(v.b.t);
+    if(r.fail){fail=r.fail;break;}
+  }
+  return fail?[fail]:evalWin();
+}
+function selfTest(){
+  const keep={d:G.diff,l:G.li,w:G.wx,p:G.prog,s:G.S};
+  const rows=[];let bad=0,total=0;
+  const add=function(ok,txt){total++;if(!ok)bad++;rows.push((ok?'✅ ':'❌ ')+txt);};
+  LV.forEach(function(L,li){
+    const flat=L.map.join('');
+    const okMap=L.map.length===7&&L.map.every(function(r){return r.length===7;})&&flat.split('S').length===2&&(!L.need.reach||flat.split('G').length===2);
+    add(okMap,'Bölüm '+(li+1)+' harita yapısı');
+    DIFFS.forEach(function(d){
+      G.diff=d;G.li=li;
+      [false,true].forEach(function(wx){
+        if(wx&&!L.wx)return;
+        G.wx=wx;
+        const prog=parse(wx?L.wx.sol:L.sol);
+        const miss=runSync(prog);
+        G.prog=prog;const f=starFlags();
+        const ok=miss.length===0&&(wx||(f.s2&&f.s3));
+        add(ok,'Bölüm '+(li+1)+' • '+DN[d]+(wx?' • yağmurlu':'')+' • '+f.used+' blok (hedef ≤ '+f.par+') • kalan enerji '+G.S.energy+
+          (ok?'':' • SORUN: '+(miss.join(' / ')||'yıldız koşulu sağlanmadı (2.⭐:'+f.s2+', 3.⭐:'+f.s3+')')));
+      });
+      if(L.preset){
+        G.wx=false;
+        const miss=runSync(parse(L.preset[d]||L.preset.normal));
+        add(miss.length>0,'Bölüm '+(li+1)+' • '+DN[d]+' • hatalı hazır kod gerçekten hata veriyor');
+      }
+    });
+  });
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;inset:0;z-index:5000;background:#fff;overflow:auto;padding:16px;font:14px/1.5 monospace;color:#111';
+  box.innerHTML='<h2>Otomatik doğrulama: '+(total-bad)+' / '+total+' başarılı'+(bad?' — ❌ '+bad+' sorun':' 🎉')+'</h2>'+
+    '<button onclick="this.parentNode.remove()" style="padding:8px 16px;font-size:16px">Kapat</button><pre>'+rows.join('\n')+'</pre>';
+  document.body.appendChild(box);
+  G.diff=keep.d;G.li=keep.l;G.wx=keep.w;G.prog=keep.p;G.S=keep.s;
+}
+/* ====== BUMBLEBEE PLUS v2 ====== */
+/* ---- Ses motoru (dosya gerekmez) ---- */
+const SND=(function(){
+  let ctx=null,on=true;try{on=localStorage.getItem('bb_snd')!=='0';}catch(e){}
+  function ac(){if(!ctx){try{ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(ctx.state==='suspended')ctx.resume();return ctx;}
+  function t(f,at,d,ty,v,sl){const c=ac();if(!c||!on)return;const o=c.createOscillator(),g=c.createGain(),n=c.currentTime+at;
+    o.type=ty||'square';o.frequency.setValueAtTime(f,n);if(sl)o.frequency.exponentialRampToValueAtTime(sl,n+d);
+    g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(v||.1,n+.012);g.gain.exponentialRampToValueAtTime(.0001,n+d);
+    o.connect(g);g.connect(c.destination);o.start(n);o.stop(n+d+.03);}
+  return{
+    isOn:function(){return on;},unlock:function(){ac();},
+    set:function(v){on=v;try{localStorage.setItem('bb_snd',v?'1':'0');}catch(e){}},
+    coin:function(){t(988,0,.07,'square',.09);t(1319,.07,.28,'square',.09);},
+    turn:function(){t(520,0,.06,'triangle',.08);},
+    bump:function(){t(150,0,.18,'sawtooth',.12,60);},
+    collect:function(){[784,988,1175,1568].forEach(function(f,i){t(f,i*.06,.14,'triangle',.1);});},
+    power:function(){t(440,0,.1,'square',.08);t(660,.08,.1,'square',.08);t(880,.16,.2,'square',.08);},
+    wind:function(){t(300,0,.25,'sawtooth',.04,700);},
+    drop:function(){t(392,0,.1,'triangle',.1);t(523,.1,.18,'triangle',.1);},
+    honey:function(){[523,659,784,1047,1319].forEach(function(f,i){t(f,i*.09,.22,'triangle',.11);});},
+    nope:function(){t(220,0,.14,'square',.07);},
+    fail:function(){[392,330,262,196].forEach(function(f,i){t(f,i*.14,.22,'sawtooth',.08);});},
+    win:function(){[[523,0],[659,.12],[784,.24],[1047,.36],[784,.52],[1047,.62],[1319,.74]].forEach(function(a){t(a[0],a[1],.24,'square',.09);});t(1568,.95,.5,'triangle',.1);},
+    click:function(){t(700,0,.04,'square',.05);},
+    trash:function(){t(300,0,.12,'triangle',.08,120);}
+  };
+})();
+document.addEventListener('pointerdown',function(){SND.unlock();},{once:true,capture:true});
+
+/* ---- Ek stiller ---- */
+const css2=document.createElement('style');
+css2.textContent=`
+.cell{position:relative}
+.co{position:absolute;font-style:normal;font-size:10px;font-weight:700;color:rgba(0,0,0,.38);line-height:1}
+.cx{top:3px;left:5px}.cy{bottom:3px;left:5px}
+.pal,.wsbox{height:clamp(380px,64vh,680px);max-height:none}
+@media(max-width:620px){.pal{height:auto;max-height:210px}.wsbox{height:clamp(300px,56vh,560px)}}
+#prog{padding:2px 26px;background:linear-gradient(90deg,rgba(255,196,0,.2) 22px,transparent 22px,transparent calc(100% - 22px),rgba(255,196,0,.2) calc(100% - 22px))}
+#endzone{position:sticky;bottom:0;margin-top:8px;padding:12px;text-align:center;font-weight:700;color:#8A6D00;background:linear-gradient(0deg,#FFF3C4,rgba(255,243,196,.9));border:3px dashed #FFC400;border-radius:14px;z-index:3}
+#endzone.hot{background:#FFE08A;transform:scale(1.02)}
+.ph{height:10px;margin:4px 0;border-radius:6px;background:#FF2D78;box-shadow:0 0 0 3px rgba(255,45,120,.25)}
+.blk.sel{outline:4px solid #FF2D78;outline-offset:2px}
+.blk .slot.target,#prog.target{outline:3px dashed #FF2D78;background:rgba(255,45,120,.14)!important}
+.pal.trash{outline:4px dashed #FF4D6D;background:#FFE3E8}
+.pal.trash::after{content:'🗑️ Bırak = Sil';display:block;position:sticky;bottom:0;text-align:center;font-weight:700;color:#C22A47;background:#FFE3E8}
+.tpl{touch-action:pan-y}
+.ghost{max-height:55vh;overflow:hidden}
+body.dragging{user-select:none;-webkit-user-select:none}
+.wsbox.compact .blk{margin:3px 0;font-size:13px}.wsbox.compact .blk .hd{padding:5px 9px}.wsbox.compact .blk .slot{padding:2px 4px;min-height:26px}
+.tbtn{background:#fff;border:2px solid #CFE3F3;border-radius:12px;padding:5px 9px;font-size:16px;cursor:pointer}
+#where{font-size:13px;margin:4px 2px;color:#5B34C4;font-weight:600}
+#codeview{margin-top:10px;background:#1E293B;color:#E2E8F0;border-radius:14px;padding:10px}
+#codeview .mini{color:#9CC8FF}
+#codeview pre{margin:6px 0;font:12px/1.5 Consolas,monospace;white-space:pre;overflow:auto;max-height:260px}
+#codeview small{color:#94A3B8}
+.cf{position:relative;width:1123px;height:794px;overflow:hidden;background:linear-gradient(135deg,#FFF7D6,#CFF3FF 55%,#D8F8B8);font-family:Fredoka,'Segoe UI',sans-serif;color:#23304A;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cf .rays{position:absolute;left:50%;top:44%;width:1500px;height:1500px;transform:translate(-50%,-50%);background:repeating-conic-gradient(rgba(255,196,0,.16) 0 7.5deg,transparent 7.5deg 15deg);border-radius:50%}
+.cf .fr{position:absolute;inset:22px;border:10px solid #FF9F1C;border-radius:30px;box-shadow:inset 0 0 0 6px #fff,inset 0 0 0 10px #2F9BFF;text-align:center;padding:24px 60px}
+.cf .cn{position:absolute;font-size:62px}.cf .c1{left:34px;top:28px}.cf .c2{right:34px;top:28px}.cf .c3{left:34px;bottom:28px}.cf .c4{right:34px;bottom:28px}
+.cf .top{font-weight:700;letter-spacing:2px;color:#1B6FD1;font-size:19px}
+.cf .rb{display:inline-block;margin:10px 0 2px;background:linear-gradient(90deg,#FF7A00,#FF4D8D);color:#fff;font-weight:700;font-size:40px;padding:8px 44px;border-radius:14px;box-shadow:0 6px 0 #C2410C;letter-spacing:1px}
+.cf .sub{font-size:20px;margin-top:6px}
+.cf .nm{font-family:Pacifico,cursive;font-size:66px;color:#E11D74;line-height:1.15;text-shadow:0 3px 0 #FFE08A}
+.cf .cl{font-size:20px;color:#5B34C4;font-weight:600;min-height:26px}
+.cf .tx{font-size:20px;line-height:1.4;max-width:820px;margin:4px auto}
+.cf .md{display:flex;align-items:center;justify-content:center;gap:30px;margin:6px 0}
+.cf .medal{width:124px;height:124px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF3A6,#FFC400 60%,#E69A00);border:6px solid #fff;box-shadow:0 6px 0 #C27200,0 0 0 6px #FFC400;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700}
+.cf .medal b{font-size:38px;line-height:1}.cf .medal small{font-size:14px}
+.cf .sk{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:880px;margin:6px auto}
+.cf .sk span{background:#fff;border:3px solid #22C55E;border-radius:20px;padding:3px 12px;font-size:16px;font-weight:600}
+.cf .sk span.no{border-color:#CBD5E1;color:#94A3B8}
+.cf .stz{font-size:20px;letter-spacing:1px;color:#FFB400;word-break:break-all;max-width:640px}
+.cf .fo{position:absolute;left:70px;right:70px;bottom:42px;display:flex;justify-content:space-between;align-items:flex-end;font-size:16px}
+.cf .sg{border-top:3px solid #23304A;padding-top:4px;min-width:250px;font-weight:600}
+.cf .seal{font-size:56px}
+@media print{@page{size:A4 landscape;margin:0}#cert.cert{display:block!important;margin:0!important;padding:0!important;border:0!important;min-height:0!important;background:none!important}}
+`;
+document.head.appendChild(css2);
+const lk2=document.createElement('link');lk2.rel='stylesheet';lk2.href='https://fonts.googleapis.com/css2?family=Pacifico&display=swap';document.head.appendChild(lk2);
+
+/* ---- Tahta: koordinat harfleri ---- */
+function drawBoard(){
+  const S=G.S;let h='';
+  for(let y=0;y<7;y++)for(let x=0;x<7;x++){
+    const c=S.cells[y][x];let cls='cell '+((x+y)%2?'b':'a'),ch='';
+    if(c==='#')ch='🌳';else if(c==='R'){cls+=' t-rain';ch='🌧️';}
+    else if(c==='S'){cls+=' t-hive';ch='🏠';}
+    else if(c==='G'){cls+=' t-goal';ch='🌻';}
+    else if(c==='p')ch='🌼';else if(c==='n')ch='🌺';else if(c==='E')ch='🔋';
+    else if(WIND[c]!==undefined){cls+=' t-wind';ch=WEM[c];}
+    else if(S.done.has(x+','+y))ch='🌱';
+    h+='<div class="'+cls+'">'+(y===0?'<i class="co cx">'+'ABCDEFG'[x]+'</i>':'')+(x===0?'<i class="co cy">'+(y+1)+'</i>':'')+ch+'</div>';
+  }
+  $('#grid').innerHTML=h;
+}
+
+/* ---- Çalıştırma: adım adım, sesli ---- */
+function resetSim(){
+  G.it=null;G.stepping=false;G.S=newSim();
+  document.querySelectorAll('.blk.run').forEach(function(e){e.classList.remove('run');});
+  drawBoard();drawBee();drawEnergy();drawInv();
+}
+function sfx(t,out){
+  const m=out.toast||'';
+  if(out.bump)return SND.bump();
+  if(t==='fwd'){SND.coin();if(m.indexOf('Rüzgâr')>-1)setTimeout(SND.wind,130);if(m.indexOf('enerji')>-1)setTimeout(SND.power,200);return;}
+  if(t==='left'||t==='right')return SND.turn();
+  if(m.indexOf('+1')===0)return SND.collect();
+  if(m.indexOf('BAL')>-1)return SND.honey();
+  if(m.indexOf('bırakıldı')>-1)return SND.drop();
+  if(m)SND.nope();
+}
+function advance(){
+  for(;;){
+    const r=G.it.next();
+    if(r.done)return {done:1};
+    const v=r.value;
+    if(v.hl){hl(v.hl);continue;}
+    if(++G.guard>500)return {fail:'Bumblebee çok uzun süre uçtu! 🔄 Sonsuz bir döngü olabilir mi?'};
+    hl(v.b.id);
+    const out=act(v.b.t);
+    drawBoard();drawBee(out.bump);drawEnergy();drawInv();
+    if(out.toast)toast(out.toast);
+    sfx(v.b.t,out);
+    if(out.fail)return {fail:out.fail};
+    return {ok:1};
+  }
+}
+async function runProg(){
+  if(G.running)return;
+  if(!G.prog.length){toast('Önce bazı bloklar ekle! 🧩');return;}
+  closeModal();SND.click();
+  if(!G.it){resetSim();G.it=walk(G.prog);G.guard=0;}
+  G.stepping=false;G.running=true;setBtns();
+  const tok=++G.tok;
+  await sleep(220);
+  while(tok===G.tok){
+    const r=advance();
+    if(r.done||r.fail){G.running=false;setBtns();hl(0);G.it=null;finish(r.fail||'');return;}
+    await sleep(G.speed);
+  }
+}
+function stepOnce(){
+  if(G.running)return;
+  if(!G.prog.length){toast('Önce bazı bloklar ekle! 🧩');return;}
+  closeModal();
+  if(!G.it){resetSim();G.it=walk(G.prog);G.guard=0;}
+  G.stepping=true;
+  const r=advance();
+  if(r.done||r.fail){hl(0);G.it=null;G.stepping=false;finish(r.fail||'');}
+}
+function finish(failMsg){
+  if(failMsg){SND.fail();return failModal(failMsg);}
+  const miss=evalWin();
+  if(miss.length){SND.fail();return failModal('Görev tamamlanamadı: '+miss.join(' • '));}
+  if(!G.viewing)SND.win();
+  successModal();
+}
+
+/* ---- Çalışma alanı: seçim, geri al, serbest sürükleme ---- */
+let gh=null,ph=null,tg=null,orig=null,fromWs=false,lastEv=null,scrollV=0,winV=0,raf=0,codeLang='java';
+function has(a,x){if(a===x)return true;return a.some(function(b){return (b.body&&has(b.body,x))||(b.else&&has(b.else,x));});}
+function renderWS(skip){
+  if(G.lastFor!==G.prog){G.hist=[];G.last=undefined;G.lastFor=G.prog;G.sel=null;}
+  const root=$('#prog');root.innerHTML='';root._arr=G.prog;
+  G.prog.forEach(function(b){root.appendChild(blockEl(b,G.prog));});
+  $('#cnt').textContent=cnt(G.prog);$('#par').textContent=curL().par+PARADD[G.diff];
+  if(!skip){
+    const now=JSON.stringify(G.prog);
+    if(G.last!==undefined&&G.last!==now){G.hist.push(G.last);if(G.hist.length>60)G.hist.shift();}
+    G.last=now;
+    if(G.it&&!G.running)resetSim();
+  }
+  applySel();updateCode();
+}
+function undo(){
+  if(G.running)return;
+  if(!G.hist||!G.hist.length){toast('Geri alınacak bir şey yok ↩');return;}
+  const prev=G.hist.pop();
+  G.prog.length=0;JSON.parse(prev).forEach(function(b){G.prog.push(b);});
+  G.last=prev;G.sel=null;SND.click();renderWS(1);
+  if(G.it)resetSim();
+}
+function applySel(){
+  document.querySelectorAll('#wsbox .sel,#wsbox .target').forEach(function(e){e.classList.remove('sel','target');});
+  if(G.sel&&!has(G.prog,G.sel.arr))G.sel=null;
+  let msg='programın <b>sonuna</b>';
+  if(G.sel){
+    if(G.sel.id){
+      const e=document.querySelector('#wsbox .blk[data-id="'+G.sel.id+'"]');
+      if(e){e.classList.add('sel');msg='<b>seçili bloğun altına</b>';}else G.sel=null;
+    }else{
+      document.querySelectorAll('#wsbox .slot').forEach(function(sl){if(sl._arr===G.sel.arr&&sl.id!=='prog')sl.classList.add('target');});
+      msg=G.sel.arr===G.prog?'programın <b>sonuna</b>':'<b>döngü / koşulun içine</b>';
+    }
+  }
+  const w=$('#where');
+  if(w)w.innerHTML='📍 Dokunarak eklenen blok '+msg+' gelir. <span style="color:#889">(Yeri seçmek için bir bloğa dokun)</span>';
+}
+function addTap(t){
+  if(G.running)return;
+  const nb=mk(t);let arr=G.prog,idx=G.prog.length;const s=G.sel;
+  if(s&&has(G.prog,s.arr)){
+    arr=s.arr;
+    if(s.id){const i=arr.findIndex(function(x){return x.id===s.id;});idx=i>-1?i+1:arr.length;}else idx=arr.length;
+  }
+  arr.splice(idx,0,nb);
+  G.sel=nb.body?{arr:nb.body}:{arr:arr,id:nb.id};
+  SND.click();renderWS();
+  const el=document.querySelector('#wsbox .blk[data-id="'+nb.id+'"]');
+  if(el)el.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+$('#wsbox').addEventListener('click',function(e){
+  const slot=e.target.classList&&e.target.classList.contains('slot')?e.target:null;
+  if(slot&&slot._arr){G.sel=slot.id==='prog'?null:{arr:slot._arr};applySel();return;}
+  if(e.target.closest('.blk'))return;
+  G.sel=null;applySel();
+});
+function listen(mv,up){
+  const off=function(){window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',fin);window.removeEventListener('pointercancel',fin);};
+  const fin=function(ev){off();up(ev,ev.type==='pointercancel');};
+  window.addEventListener('pointermove',mv);window.addEventListener('pointerup',fin);window.addEventListener('pointercancel',fin);
+}
+function beginGhost(grp){
+  gh=document.createElement('div');gh.className='ghost';
+  grp.forEach(function(b){gh.appendChild(blockEl(b,null,true));});
+  document.body.appendChild(gh);document.body.classList.add('dragging');
+  ph=document.createElement('div');ph.className='ph';
+  raf=requestAnimationFrame(tick);
+}
+function tick(){
+  if(!gh)return;
+  if(scrollV||winV){if(scrollV)$('#wsbox').scrollTop+=scrollV;if(winV)window.scrollBy(0,winV);if(lastEv)updTarget(lastEv);}
+  raf=requestAnimationFrame(tick);
+}
+function locate(slot,y){
+  const kids=[].filter.call(slot.children,function(c){return c.classList.contains('blk');});
+  let idx=kids.length;
+  for(let i=0;i<kids.length;i++){const r=kids[i].getBoundingClientRect();if(y<r.top+r.height/2){idx=i;break;}}
+  return {arr:slot._arr,el:slot,idx:idx};
+}
+function pick(x,y){
+  const els=document.elementsFromPoint(x,y);
+  for(let i=0;i<els.length;i++){
+    const el=els[i];
+    if(el.classList&&el.classList.contains('hat'))return {arr:G.prog,el:$('#prog'),idx:0};
+    if(el.classList&&el.classList.contains('slot')&&el._arr)return locate(el,y);
+  }
+  const r=$('#wsbox').getBoundingClientRect();
+  if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return {arr:G.prog,el:$('#prog'),idx:G.prog.length};
+  return null;
+}
+function overPal(ev){const r=$('#pal').getBoundingClientRect();return ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom;}
+function updTarget(ev){
+  const t=overPal(ev)?null:pick(ev.clientX,ev.clientY);
+  tg=t;
+  if(!t){if(ph.parentNode)ph.remove();}
+  else{
+    const kids=[].filter.call(t.el.children,function(c){return c.classList.contains('blk');});
+    const ref=kids[t.idx]||null;
+    if(ref)t.el.insertBefore(ph,ref);else t.el.appendChild(ph);
+  }
+  const ez=$('#endzone');if(ez)ez.classList.toggle('hot',!!t&&t.arr===G.prog&&t.idx===G.prog.length);
+}
+function dragMove(ev){
+  lastEv=ev;gh.style.left=(ev.clientX-26)+'px';gh.style.top=(ev.clientY-16)+'px';
+  updTarget(ev);
+  const w=$('#wsbox').getBoundingClientRect();scrollV=0;
+  if(ev.clientX>=w.left-30&&ev.clientX<=w.right+30){
+    if(ev.clientY<w.top+56&&ev.clientY>w.top-90)scrollV=-Math.max(5,Math.ceil((w.top+56-ev.clientY)/3));
+    else if(ev.clientY>w.bottom-56&&ev.clientY<w.bottom+90)scrollV=Math.max(5,Math.ceil((ev.clientY-(w.bottom-56))/3));
+  }
+  winV=ev.clientY<46?-14:(ev.clientY>innerHeight-46?14:0);
+  $('#pal').classList.toggle('trash',fromWs&&overPal(ev));
+}
+function cleanup(){
+  if(gh){gh.remove();gh=null;}
+  document.body.classList.remove('dragging');
+  if(ph&&ph.parentNode)ph.remove();
+  tg=null;cancelAnimationFrame(raf);scrollV=0;winV=0;
+  $('#pal').classList.remove('trash');const ez=$('#endzone');if(ez)ez.classList.remove('hot');
+}
+function endGhost(ev,grp){
+  const t=tg,over=overPal(ev);cleanup();
+  if(over&&fromWs){SND.trash();toast('🗑️ Silindi (↩ ile geri al)');}
+  else if(t){t.arr.splice.apply(t.arr,[t.idx,0].concat(grp));G.sel={arr:t.arr,id:grp[grp.length-1].id};SND.click();}
+  else if(fromWs&&orig){orig.arr.splice.apply(orig.arr,[orig.idx,0].concat(grp));}
+  renderWS();
+}
+function abortGhost(grp){cleanup();if(fromWs&&orig)orig.arr.splice.apply(orig.arr,[orig.idx,0].concat(grp));renderWS();}
+function palDown(e,t){
+  if(G.running)return;
+  if(e.pointerType==='mouse'){if(e.button!==0)return;e.preventDefault();}
+  const sx=e.clientX,sy=e.clientY;let moved=false,nb=null;
+  listen(function(ev){
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>8){moved=true;nb=[mk(t)];orig=null;fromWs=false;beginGhost(nb);}
+    if(moved)dragMove(ev);
+  },function(ev,cancel){
+    if(moved){if(cancel)abortGhost(nb);else endGhost(ev,nb);}
+    else if(!cancel)addTap(t);
+  });
+}
+function blockDown(e,b,arr,d){
+  if(G.running)return;
+  if(e.target.closest('select,.x'))return;
+  const s=e.target.closest('.slot');
+  if(s&&s!==d&&d.contains(s))return;
+  e.stopPropagation();e.preventDefault();
+  const sx=e.clientX,sy=e.clientY,single=e.altKey||e.shiftKey;let moved=false,grp=null;
+  listen(function(ev){
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>6){
+      const i=arr.indexOf(b);if(i<0)return;
+      moved=true;orig={arr:arr,idx:i};fromWs=true;
+      grp=single?arr.splice(i,1):arr.splice(i);
+      G.sel=null;renderWS(1);beginGhost(grp);
+    }
+    if(moved)dragMove(ev);
+  },function(ev,cancel){
+    if(moved){if(cancel)abortGhost(grp);else endGhost(ev,grp);}
+    else if(!cancel){G.sel={arr:arr,id:b.id};applySel();SND.click();}
+  });
+}
+document.addEventListener('keydown',function(e){
+  if($('#game').classList.contains('hidden'))return;
+  if(e.target.closest&&e.target.closest('input,select,textarea'))return;
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();}
+  else if((e.key==='Delete'||e.key==='Backspace')&&G.sel&&G.sel.id&&!G.running){
+    e.preventDefault();
+    const i=G.sel.arr.findIndex(function(x){return x.id===G.sel.id;});
+    if(i>-1){G.sel.arr.splice(i,1);G.sel=null;SND.trash();renderWS();}
+  }
+});
+
+/* ---- FTC tarzı kod görünümü ---- */
+const CJ={blocked:'bumblebee.isBlocked()',clear:'!bumblebee.isBlocked()',rainAhead:'bumblebee.rainAhead()',pollenHere:'colorSensor.isPollenFlower()',nectarHere:'colorSensor.isNectarFlower()',atHive:'bumblebee.atHive()',lowEnergy:'bumblebee.energy() <= 3'};
+const CP={blocked:'bumblebee.is_blocked()',clear:'not bumblebee.is_blocked()',rainAhead:'bumblebee.rain_ahead()',pollenHere:'color_sensor.is_pollen_flower()',nectarHere:'color_sensor.is_nectar_flower()',atHive:'bumblebee.at_hive()',lowEnergy:'bumblebee.energy() <= 3'};
+const JM={fwd:'forward',left:'turnLeft',right:'turnRight',pollen:'collectPollen',nectar:'collectNectar',drop:'dropAtHive'};
+const PM={fwd:'forward',left:'turn_left',right:'turn_right',pollen:'collect_pollen',nectar:'collect_nectar',drop:'drop_at_hive'};
+function genJ(a,d,lv){
+  const p='    '.repeat(d);let o='';
+  a.forEach(function(b){
+    if(b.t==='repeat'){const v='ijklmn'[lv]||'z';o+=p+'for (int '+v+' = 0; '+v+' < '+b.n+'; '+v+'++) {\n'+genJ(b.body,d+1,lv+1)+p+'}\n';}
+    else if(b.t==='if')o+=p+'if ('+CJ[b.c]+') {\n'+genJ(b.body,d+1,lv)+p+'}\n';
+    else if(b.t==='ifelse')o+=p+'if ('+CJ[b.c]+') {\n'+genJ(b.body,d+1,lv)+p+'} else {\n'+genJ(b.else,d+1,lv)+p+'}\n';
+    else o+=p+'bumblebee.'+JM[b.t]+'();\n';
+  });
+  return o;
+}
+function genP(a,d){
+  const p='    '.repeat(d);let o='';
+  const body=function(x){return genP(x,d+1)||('    '.repeat(d+1)+'pass\n');};
+  a.forEach(function(b){
+    if(b.t==='repeat')o+=p+'for _ in range('+b.n+'):\n'+body(b.body);
+    else if(b.t==='if')o+=p+'if '+CP[b.c]+':\n'+body(b.body);
+    else if(b.t==='ifelse')o+=p+'if '+CP[b.c]+':\n'+body(b.body)+p+'else:\n'+body(b.else);
+    else o+=p+'bumblebee.'+PM[b.t]+'()\n';
+  });
+  return o;
+}
+function updateCode(){
+  const cv=$('#codeview');if(!cv||cv.classList.contains('hidden'))return;
+  $('#codetxt').textContent=codeLang==='java'
+    ?('@Autonomous(name = "BumblebeeOtonom")\npublic class BumblebeeOtonom extends LinearOpMode {\n    @Override\n    public void runOpMode() {\n        waitForStart();\n'+genJ(G.prog,2,0)+'    }\n}')
+    :('# Bumblebee API ile örnek (Python)\nbumblebee.wait_for_start()\n'+genP(G.prog,0));
+}
+
+/* ---- Sesli anlatım, bölüm planı, FTC penceresi ---- */
+function speak(){
+  if(!('speechSynthesis' in window)){toast('Bu tarayıcı sesli okumayı desteklemiyor');return;}
+  speechSynthesis.cancel();
+  const L=curL(),tmp=document.createElement('div');tmp.innerHTML=L.story;
+  const u=new SpeechSynthesisUtterance(L.title+'. '+tmp.textContent+' Görev: '+L.goal);
+  u.lang='tr-TR';u.rate=.95;speechSynthesis.speak(u);
+}
+function showPlan(){
+  let h='<h2>🗺️ Bölümler</h2><div style="text-align:left;max-height:58vh;overflow:auto">';
+  LV.forEach(function(L,i){
+    const ok=unlocked(i);
+    h+='<button class="btn" data-go="'+i+'" '+(ok?'':'disabled')+' style="display:block;width:100%;margin:6px 0;text-align:left;background:'+(ok?'#2F9BFF':'#94A3B8')+'">'+(ok?(i+1):'🔒')+'. '+L.title+' <small>• '+L.tag+'</small><span style="float:right">'+'⭐'.repeat(starsOf(G.diff,i))+'</span></button>';
+  });
+  openModal(h+'</div><div class="mb"><button class="btn" data-a="close">Kapat</button></div>');
+}
+function showFtc(){
+  openModal('<h2>🤖 FIRST® ve FTC nedir?</h2><div class="fact"><b>FIRST®</b> (For Inspiration and Recognition of Science and Technology), öğrencilerin robot yaparak bilim ve teknolojiyi sevmesi için çalışan uluslararası bir kuruluştur.</div>'+
+    '<div class="fact"><b>FIRST® Tech Challenge (FTC)</b>: 7. sınıftan lise sonuna kadar takımlar robot tasarlar, kodlar ve yarışır. Maçlar otonom (kimse kumanda etmeden, 30 sn) ve sürücü kontrollü bölümlerden oluşur. Bumblebee de ODTÜmus Prime (#25601) takımımızın robotunun adı!</div>'+
+    '<div class="fact">💛 <b>Gracious Professionalism®</b>: yarışırken bile nazik ve saygılı olmak.<br>🤝 <b>Coopertition®</b>: rakiplerle bile bilgi paylaşıp birlikte öğrenmek.</div>'+
+    '<div class="fact">🧩 Bu oyundaki enerji, döngü, koşul ve hata ayıklama gerçek robot kodlamasındaki fikirlerin aynısı. Gerçek FTC sahası 12×12 fit ve 6×6 köpük karodan oluşur.</div>'+
+    '<div class="mb"><a class="btn" href="https://www.firstinspires.org/robotics/ftc" target="_blank" rel="noopener">FTC\'yi keşfet</a><a class="btn alt" href="/">ODTÜmus Prime</a><button class="btn" data-a="close">Kapat</button></div>');
+}
+$('#mbox').addEventListener('click',function(e){
+  const g=e.target.closest('[data-go]');
+  if(g&&!g.disabled){closeModal();stopRun();loadLevel(+g.dataset.go);}
+});
+
+/* ---- Düğmeler ve ek alanlar ---- */
+function mkBtn(txt,cls,fn,parent,before,title){
+  const b=document.createElement('button');b.className=cls;b.innerHTML=txt;if(title)b.title=title;b.onclick=fn;
+  if(before)parent.insertBefore(b,before);else parent.appendChild(b);return b;
+}
+(function initPlus(){
+  const tools=document.querySelector('.tools'),eb=$('#endbtn'),ctrl=document.querySelector('.ctrl');
+  mkBtn('🗺️','tbtn',showPlan,tools,eb,'Bölümler');
+  mkBtn('🤖','tbtn',showFtc,tools,eb,'FTC nedir?');
+  const sb=mkBtn(SND.isOn()?'🔊':'🔇','tbtn',function(){SND.set(!SND.isOn());sb.innerHTML=SND.isOn()?'🔊':'🔇';SND.coin();},tools,eb,'Ses aç/kapat');
+  mkBtn('⏯ Adım adım','btn',stepOnce,ctrl,$('#hintbtn'));
+  mkBtn('↩ Geri al','btn',undo,ctrl,$('#hintbtn'));
+  mkBtn('🔍 Küçült','btn',function(){const c=$('#wsbox').classList.toggle('compact');this.innerHTML=c?'🔍 Büyüt':'🔍 Küçült';},ctrl,$('#hintbtn'),'Çok blok olunca bloklar küçülür');
+  mkBtn('💻 FTC kodu','btn pur',function(){$('#codeview').classList.toggle('hidden');updateCode();},ctrl,$('#hintbtn'));
+  mkBtn('🗣️ Görevi dinle','mini',speak,document.querySelector('.lvhd'),null);
+  const ez=document.createElement('div');ez.id='endzone';ez.textContent='⬇️ En sona eklemek için buraya bırak';
+  ez.addEventListener('click',function(){G.sel=null;applySel();toast('Dokunarak eklenen bloklar programın sonuna gelecek');});
+  $('#wsbox').appendChild(ez);
+  const wh=document.createElement('div');wh.id='where';document.querySelector('.stat').after(wh);
+  const cv=document.createElement('div');cv.id='codeview';cv.className='hidden';
+  cv.innerHTML='<div><b>💻 FTC tarzı kod</b> &nbsp;<button class="mini" data-l="java">Java</button> <button class="mini" data-l="py">Python</button> <button class="mini" id="cvcopy">📋 Kopyala</button></div><pre id="codetxt"></pre><small>Gerçek FTC robotlarında bu komutlar motor ve sensör kodlarına dönüşür. Buradaki isimler oyuna özgü örneklerdir.</small>';
+  $('#viewnote').after(cv);
+  cv.addEventListener('click',function(e){
+    const l=e.target.closest('[data-l]');if(l){codeLang=l.dataset.l;updateCode();}
+    if(e.target.id==='cvcopy'){if(navigator.clipboard)navigator.clipboard.writeText($('#codetxt').textContent);toast('Kopyalandı 📋');}
+  });
+})();
+
+/* ---- Sertifika ---- */
+function esc(s){return s.replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function certHtml(name,cls){
+  const n=totalStars();
+  const sk=[['🧭 Hareket',[0,1]],['🔀 Yönler ve labirent',[2,3]],['🌼 Algoritma',[4,5]],['🔁 Döngüler',[6,7]],['🔧 Hata ayıklama',[8]],['❓ Koşullar',[9]],['📦 Çok aşamalı görev',[10]],['🍯 Problem çözme',[11]]];
+  const chips=sk.map(function(s){const ok=s[1].every(function(i){return starsOf(G.diff,i)>0;});return '<span class="'+(ok?'':'no')+'">'+(ok?'✔ ':'')+s[0]+'</span>';}).join('');
+  const date=new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  return '<div class="cf"><div class="rays"></div><div class="fr">'+
+    '<span class="cn c1">🌻</span><span class="cn c2">🌼</span><span class="cn c3">🌼</span><span class="cn c4">🌻</span>'+
+    '<div class="top">🐝 FIRST® TECH CHALLENGE • ODTÜMUS PRIME #25601</div>'+
+    '<div class="rb">KOD ARICISI SERTİFİKASI</div><div class="sub">Bu sertifika, gururla</div>'+
+    '<div class="nm">'+esc(name)+'</div><div class="cl">'+esc(cls)+'</div>'+
+    '<div class="tx">Bumblebee\'nin Bahçesi\'nde blok kodlamayla robot arı Bumblebee\'yi yönetti, polen ve nektar topladı, bahçeyi kurtardı ve 🍯 bal üretti!</div>'+
+    '<div class="md"><div class="medal"><b>'+n+'</b><small>/ 36 ⭐</small><small>'+DN[G.diff]+'</small></div><div class="stz">'+'★'.repeat(n)+'☆'.repeat(36-n)+'</div></div>'+
+    '<div class="sk">'+chips+'</div>'+
+    '<div class="fo"><div>📅 '+date+'<br>odtumusprime.com</div><div class="seal">🐝</div><div class="sg">ODTÜmus Prime #25601 Takımı<br><small>We Build, We Learn, We Inspire.</small></div></div>'+
+    '</div></div>';
+}
+function updCert(){
+  const n=($('#cname').value||'').trim()||'Genç Kod Arıcısı',c=($('#ccls').value||'').trim();
+  const h=certHtml(n,c);
+  $('#certPrev').innerHTML='<div id="certScale">'+h+'</div>';
+  $('#cert').innerHTML=h;fitCert();
+}
+function fitCert(){
+  const p=$('#certPrev'),s=$('#certScale');if(!p||!s)return;
+  const sc=Math.min(1,(p.clientWidth||1123)/1123);
+  s.style.transformOrigin='top left';s.style.transform='scale('+sc+')';p.style.height=(794*sc)+'px';
+}
+window.addEventListener('resize',fitCert);
+(function initCert(){
+  const box=document.querySelector('.certbox');
+  box.innerHTML='<input id="cname" placeholder="Adını yaz" maxlength="30"><input id="ccls" placeholder="Sınıf / okul (isteğe bağlı)" maxlength="30"><button class="btn alt" id="print">🖨️ Yazdır / PDF kaydet</button>';
+  const pv=document.createElement('div');pv.id='certPrev';pv.style.cssText='width:100%;margin:10px 0;overflow:hidden';
+  box.parentNode.insertBefore(pv,box);
+  $('#cname').oninput=updCert;$('#ccls').oninput=updCert;
+  $('#print').onclick=function(){updCert();setTimeout(function(){window.print();},150);};
+})();
+function showEnd(){
+  stopRun();
+  const t=totalStars();let done=0;for(let i=0;i<12;i++)if(starsOf(G.diff,i)>0)done++;
+  $('#endtxt').innerHTML='<b>'+DN[G.diff]+'</b> seviyede <b>'+done+' / 12</b> bölümü tamamladın ve <b>'+t+' / 36 ⭐</b> topladın!'+(done<12?'<br>Kalan bölümleri de bitirmeyi unutma! 🐝':'<br>Bahçe kurtuldu, kovan bal dolu! 🍯');
+  const bd=Object.keys(SAVE.badges).length;
+  $('#endbadges').innerHTML=bd?'🌦️ Hava Ustası rozeti: <b>'+bd+'</b> bölüm':'';
+  show('end');updCert();
+  if(done===12){SND.win();confetti();}
+}
+/* ---------- Başlat ---------- */
+const stl=document.createElement('style');
+stl.textContent='.tpl select,.tpl .x{pointer-events:none}.tpl{cursor:grab}';
+document.head.appendChild(stl);
+buildIntro();
+show('intro');
+if(TEST)selfTest();
+})();
+</script>
+</body>
+</html>
